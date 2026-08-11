@@ -1,0 +1,11 @@
+:root{
+    background-color: #0F1923;
+}
+
+.base{
+    justify-self: center;
+    display: flex;
+    margin-bottom: 20%;
+    width: 30%;
+    height: 30%;
+}
