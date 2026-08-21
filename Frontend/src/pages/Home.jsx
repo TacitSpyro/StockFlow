@@ -1,17 +1,16 @@
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import Navbar from "../components/Navbar";
+import { homeLinks } from "../data/navLinks";
 
 function Home() {
-  const navigate = useNavigate();
-
-  function handleLogout() {
-    navigate("/");
-  }
 
   return (
-    <div>
-      <h2>Bem-vindo à Homer simpson!</h2>
-      <button onClick={handleLogout}>Sair</button>
-    </div>
+    <>
+      <Navbar links={homeLinks} />
+      <main>
+        <h1>Página Home</h1>
+      </main>
+    </>
   );
 }
 
