@@ -1,0 +1,32 @@
+@import url('https://fonts.googleapis.com/css2?family=Zalando+Sans+SemiExpanded:ital,wght@0,200..900;1,200..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+main{
+    background-color: rgb(255, 255, 255);
+    margin-left: 3%;
+    margin-top: 3%;
+    border-radius: 5px 0px 0px 5px;
+    width: auto;
+    padding: 3%;
+}
+
+#cabeca{
+    display: flex;
+}
+
+label{
+    font-family: "Montserrat", sans-serif;
+    margin: 0%;
+    font-size: 200%;
+}
+
+.chart{
+    background-color: rgb(214, 214, 214);
+    min-height: 600px;
+    width: auto;
+    margin-top: 2%;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+
