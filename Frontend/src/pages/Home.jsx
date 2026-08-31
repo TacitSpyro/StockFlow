@@ -14,12 +14,12 @@ function Home() {
         <div id="cabeca">
           <label>Dados Recentes</label>
           <select value={modo} onChange={(e) => setModo(e.target.value)} className={styles.dropdown}>
-            <option value="coluna">Colunas</option>
-            <option value="linha">Linha</option>
+            <option value="Coluna">Colunas</option>
+            <option value="Linha">Linha</option>
           </select>
         </div>
         <div id="grafico-de-retirada" className={styles.chart}>
-          <label>"Grafico"</label>
+          <label>"Gráfico"</label>
         </div>
       </main>
     </>
