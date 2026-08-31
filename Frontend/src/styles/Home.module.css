@@ -30,3 +30,12 @@ label{
     justify-content: center;
 }
 
+.dropdown{
+    margin-left: 55%;
+    position: absolute;
+    border-radius: 20px;
+    width: 20%;
+    min-height: 3%;
+    z-index: 10;
+}
+

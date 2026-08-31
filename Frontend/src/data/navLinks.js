@@ -15,3 +15,9 @@ export const homeLinks = [
     ],
   },
 ];
+
+export const tableLinks = [
+  {
+    label: "Alterar Visualização"
+  }
+]
