@@ -9,3 +9,40 @@
     min-height: 3%;
     z-index: 10;
 }
+
+select {
+  appearance: none; /* remove estilo nativo do navegador */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 10px 40px 10px 16px;
+  font-size: 16px;
+  color: #333;
+  cursor: pointer;
+  
+  /* seta customizada via background image */
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23333' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+}
+
+select:hover {
+  border-color: #999;
+}
+
+select:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0,123,255,0.2);
+}
+
+select option {
+  background-color: #fff;
+  color: #333;
+  padding: 10px;
+  border-radius: 20px;
+}
