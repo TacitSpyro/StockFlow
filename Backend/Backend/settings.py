@@ -39,6 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'estoque',
     "corsheaders",
+    'contas',
+    'empresas',
+    'fornecedores',
 ]
 
 MIDDLEWARE = [
