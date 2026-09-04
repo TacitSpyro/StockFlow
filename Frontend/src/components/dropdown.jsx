@@ -32,13 +32,19 @@ export default function Dropdown({ label, items, as: Tag = "li", onSelect, selec
       {open && (
         <ul className="dropdown-menu">
           {items.map((item) => (
-            <li key={item.value}>
-              <button
-                className={item.value === selected ? "active" : ""}
-                onClick={() => handleSelect(item)}
-              >
-                {item.label}
-              </button>
+            <li key={item.value ?? item.href ?? item.label}>
+              {item.href ? (
+                <a href={item.href} onClick={() => setOpen(false)}>
+                  {item.label}
+                </a>
+              ) : (
+                <button
+                  className={item.value === selected ? "active" : ""}
+                  onClick={() => handleSelect(item)}
+                >
+                  {item.label}
+                </button>
+              )}
             </li>
           ))}
         </ul>
