@@ -2,6 +2,7 @@ import styles from "../styles/Tabela-Produtos.module.css"
 import { useState } from "react";
 import { homeLinks } from "../data/navLinks";
 import Navbar from "../components/Navbar";
+import Dropdown from "../components/Dropdown";
 
 function tabela() {
 
