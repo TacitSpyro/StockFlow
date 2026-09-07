@@ -1,29 +1,25 @@
-import styles from "../styles/Tabela-Produtos.module.css"
-import { useState } from "react";
-import { homeLinks } from "../data/navLinks";
-import Navbar from "../components/Navbar";
-import Dropdown from "../components/Dropdown";
+import TabelaBase from "../components/modeloTable";
 
-function tabela() {
+const opcoesOrdenacao = [
+    { value: "decrescente", label: "Ordem Decrescente" },
+    { value: "crescente", label: "Ordem Crescente" },
+    { value: "recente", label: "Mais Recente" },
+    { value: "antigo", label: "Mais Antigo" }
+]
 
-    const [modo, setModo] = useState('Recente')
-
-    return(
-        <>
-            <div id="topBar">
-                <select value={modo} onChange={(e) => setModo(e.target.value)} className={styles.dropdown}>
-                    <option value="decrescente">Ordem Decrescente</option>
-                    <option value="Crescente">Ordem Crescente</option>
-                    <option value="recentes">Mais Recente</option>
-                    <option value="antigo">Mais Antigo</option>
-                </select>
-            </div>
-            <main>
-                <label htmlFor="fo">foda</label>
-            </main>
-        </>
+function TabelaProdutos() {
+    return (
+        <TabelaBase
+            titulo="Produtos Registrados"
+            opcoesOrdenacao={opcoesOrdenacao}
+            modoInicial="recente"
+            colunas={[
+                { key: "nome", label: "Produto" },
+                { key: "preco", label: "Preço" },
+                { key: "estoque", label: "Estoque" },
+            ]}
+        />
     )
-
 }
 
-export default tabela;
+export default TabelaProdutos;

@@ -10,6 +10,9 @@ db.sqlite3
 staticfiles/
 media/
 
+node_modules/
+package-lock.json
+
 # Editor/SO
 .vscode/
 .DS_Store
