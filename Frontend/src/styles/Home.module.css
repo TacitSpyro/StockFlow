@@ -10,7 +10,7 @@ main{
     padding: 3%;
 }
 
-#cabeca{
+.cabeca{
     display: flex;
 }
 
@@ -31,11 +31,10 @@ label{
 }
 
 .dropdown{
-    margin-left: 55%;
-    position: absolute;
+    margin-left: 78%;
+    padding: 2px 5px 2px 5px;
     border-radius: 20px;
-    width: 20%;
-    min-height: 3%;
-    z-index: 10;
+    border-color: black;
+    border: 0.1px;
+    border: solid;
 }
-

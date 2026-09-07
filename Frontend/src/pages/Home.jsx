@@ -17,16 +17,18 @@ function Home() {
     <>
       <Navbar links={homeLinks} />
       <main>
-        <div id="cabeca">
+        <div className={styles.cabeca}>
           <label>Dados Recentes</label>
 
-          <Dropdown
-            as="div"
-            label={modo ? graficoEstilos.find(o => o.value === modo).label : "Categoria"}
-            items={graficoEstilos}
-            selected={modo}
-            onSelect={setModo}
-          />
+          <div className={styles.dropdown}>
+            <Dropdown
+              as="div"
+              label={modo ? graficoEstilos.find(o => o.value === modo).label : "Categoria"}
+              items={graficoEstilos}
+              selected={modo}
+              onSelect={setModo}
+            />
+          </div>
           
         </div>
         <div id="grafico-de-retirada" className={styles.chart}>
