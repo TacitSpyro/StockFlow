@@ -6,8 +6,10 @@ main{
     margin-left: 3%;
     margin-top: 3%;
     border-radius: 5px 0px 0px 5px;
-    width: auto;
+    width:97%;
+    height: auto;
     padding: 3%;
+    box-sizing: border-box;
 }
 
 .cabeca{

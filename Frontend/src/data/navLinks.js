@@ -2,7 +2,7 @@ export const homeLinks = [
   {
     label: "Ferramentas de analise",
     items: [
-      { href: "/gerar-relatorios", label: "Relatórios" },
+      { href: "/visualizar-relatorios", label: "Relatórios" },
       { href: "/tabela-produtos", label: "Produtos" },
       { href: "/tabela-fornecedores", label: "Fornecedores" },
     ],
@@ -15,9 +15,3 @@ export const homeLinks = [
     ],
   },
 ];
-
-export const tableLinks = [
-  {
-    label: "Alterar Visualização"
-  }
-]

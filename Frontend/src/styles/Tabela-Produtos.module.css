@@ -1,48 +1,20 @@
 @import url('https://fonts.googleapis.com/css2?family=Zalando+Sans+SemiExpanded:ital,wght@0,200..900;1,200..900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
 
-.dropdown{
-    margin-left: 55%;
-    position: absolute;
-    border-radius: 20px;
-    width: 20%;
-    min-height: 3%;
-    z-index: 10;
+.main{
+  display: flex;
+  justify-content: space-between;
 }
 
-select {
-  appearance: none; /* remove estilo nativo do navegador */
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  
-  background-color: #fff;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  padding: 10px 40px 10px 16px;
-  font-size: 16px;
-  color: #333;
-  cursor: pointer;
-  
-  /* seta customizada via background image */
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23333' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 12px center;
-  background-size: 16px;
-}
+.sdd{
+  /* sim, eu não vou me preucupar em usar comandos de centralização tipo justify ou align 
+  pq isso quase sempre não funciona e alem do mais essa ux só tem que ser funcional no pc da apresentação
+  se algum dia eu for vender essa bomba, eu concerto */
 
-select:hover {
-  border-color: #999;
-}
-
-select:focus {
-  outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 3px rgba(0,123,255,0.2);
-}
-
-select option {
-  background-color: #fff;
-  color: #333;
-  padding: 10px;
+  padding: 2px 5px 2px 5px;
   border-radius: 20px;
+  border-color: black;
+  border: 0.1rem;
+  border: solid;
+  max-height: fit-content;
 }
