@@ -1,7 +1,7 @@
 from django.db import models
 
-from fornecedores.models import Fornecedor
-from empresas.models import Empresa
+from app_fornecedores.models import Fornecedor
+from app_empresas.models import Empresa
 
 
 class Admin(models.Model):
@@ -19,8 +19,6 @@ class Admin(models.Model):
         on_delete=models.CASCADE,
         db_column="id_empresa",
         related_name="admins",
-        null=True,
-        blank=True,
     )
     nome_admin = models.CharField(max_length=150)
     email_admin = models.EmailField(max_length=100)

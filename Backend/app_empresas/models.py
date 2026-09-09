@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class Empresa(models.Model):
     id_empresa = models.AutoField(primary_key=True)
     razao_social_emp = models.CharField(max_length=150)
