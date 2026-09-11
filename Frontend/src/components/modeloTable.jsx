@@ -1,18 +1,49 @@
 import { useState } from "react";
 import Dropdown from "../components/Dropdown";
 import "./modeloTable.css"
+import Logout from "../assets/Logout.png"
+import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 function TabelaBase({
     titulo,
     opcoesOrdenacao,
-    modoInicial
+    modoInicial,
+    edicao,
+    texto,
+    urlDoCoiso
 }) {
 
-    const [modo, setModo] = useState(modoInicial || opcoesOrdenacao[0]?.value)
+     const navigate = useNavigate();
+
+        function handleEditar(e){
+            e.preventDefault();
+
+            console.log(urlDoCoiso)
+
+            navigate(urlDoCoiso);
+        }
+
+        const [modo, setModo] = useState(modoInicial || opcoesOrdenacao[0]?.value)
 
 
     return (
         <>
+            <div className="topbar">
+                
+                <div className="segura">
+                    <img src={Logout} alt="desloga" className="img-Table"/>
+                    <a href="/" className="-a">Desconectar</a>
+                </div>
+                
+
+                {/* Verifica se foi chamada na pagina da edição, se foi libera opção de edição*/}
+                { edicao ? ( 
+                    <button type="button" className="botaoEditar" onClick={handleEditar}>
+                        {texto}
+                    </button>
+                ) : null}
+            </div>
             <main className="main">
                 <label htmlFor="fo">{titulo}</label>
 

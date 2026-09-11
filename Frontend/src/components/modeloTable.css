@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
 .main{
   display: flex;
   justify-content: space-between;
@@ -11,4 +13,51 @@
   border: 0.1rem;
   border: solid;
   max-height: fit-content;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: #fff;
+  border-bottom: 1px solid #000;
+  justify-content: space-between;
+}
+
+.img-Table{
+  height: auto;
+  width: 6%;
+  margin-right: 3%;
+}
+
+.-a{
+  font-weight: 700;
+  font-size: 1.25rem;
+  text-decoration: none;
+  font-family: "Montserrat", sans-serif;
+}
+
+.segura{
+  display: flex;
+  padding: 0;
+  width: fit-content;
+  align-items: center;
+}
+
+.botaoEditar{
+  font-family: "Zalando Sans SemiExpanded", sans-serif;
+  height: 10%;
+  width: 15%;
+  border-radius: 20px;
+  color: #000;
+  border: 0;
+  font-size: 18px;
+}
+
+.botaoEditar:hover{
+  background-color: #d9d9d9;
+}
+
+.botaoEditar:active{
+  background-color: #b1b1b1;
 }
