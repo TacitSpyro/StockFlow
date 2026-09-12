@@ -11,6 +11,9 @@ function TabelaRelatorios() {
             titulo="Ultimos Relatórios"
             opcoesOrdenacao={opcoesOrdenacao}
             modoInicial="recente"
+            edicao= {true}
+            texto="Gerar Relatório"
+            urlDoCoiso={"/gerar-relatorio"}
             colunas={[
                 { key: "timestamp", label: "Data e Hora" },
                 { key: "linha", label: "Linha de Estoque" },

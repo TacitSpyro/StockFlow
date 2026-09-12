@@ -6,15 +6,15 @@ const opcoesOrdenacao = [
     { value: "antigo", label: "Mais Antigo Registrado" }
 ]
 
-
 function TabelaFornecedores() {
     return (
         <TabelaBase
             titulo="Fornecedores Registrados"
             opcoesOrdenacao={opcoesOrdenacao}
             modoInicial="alfabeto"
-            edicao= {false}
+            edicao= {true}
             texto="Adicionar Fornecedor"
+            urlDoCoiso={"/cadastrar/fornecedor"}
             colunas={[
                 { key: "nome", label: "Nome" },
                 { key: "cnpj", label: "CNPJ" },
