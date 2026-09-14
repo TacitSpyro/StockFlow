@@ -37,7 +37,7 @@ function TabelaBase({
                 </div>
                 
 
-                {/* Verifica se foi chamada na pagina da edição, se foi libera opção de edição*/}
+                
                 { edicao ? ( 
                     <button type="button" className="botaoEditar" onClick={handleEditar}>
                         {texto}
