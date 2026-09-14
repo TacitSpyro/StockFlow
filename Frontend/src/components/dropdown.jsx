@@ -21,6 +21,7 @@ export default function Dropdown({ label, items, as: Tag = "li", onSelect, selec
   return (
     <Tag ref={ref} className="dropdown">
       <button
+        type="button"
         className="dropdown-toggle"
         aria-haspopup="true"
         aria-expanded={open}
@@ -39,6 +40,7 @@ export default function Dropdown({ label, items, as: Tag = "li", onSelect, selec
                 </a>
               ) : (
                 <button
+                  type="button"
                   className={item.value === selected ? "active" : ""}
                   onClick={() => handleSelect(item)}
                 >
