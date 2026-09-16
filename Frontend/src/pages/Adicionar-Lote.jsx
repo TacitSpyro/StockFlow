@@ -12,6 +12,12 @@ function adicionarLote(){
         {value: "ferro", label:"Ferro"}
     ]
 
+    const situacao = [
+        {value: "Ativo", label: "Ativo"},
+        {value: "Inspecao", label: "Em Inspeção"},
+        {value: "Bloqueado", label: "Bloqueado"}
+    ]
+
     function registrarLote(e){
         e.preventDefault();
 
@@ -21,29 +27,37 @@ function adicionarLote(){
 
     return(
         <>
-            <form onSubmit={registrarLote}>
+            <div className={styles.topbar}>
+                <img src={retornar} alt="retornar" className="navbar-img"/>
+                <a href="/edição/produtos">Cancelar</a>
+            </div>
 
-                <div className={styles.topbar}>
-                    <img src={retornar} alt="retornar" className="navbar-img"/>
-                    <a href="/edição/produtos">Cancelar</a>
-                </div>
 
-                <input type="text" placeholder="Nome do Produto"/>
-                <input type="text" placeholder="Lote do Fornecedor"/>
-                <label className={styles.label}>Data Do Recebimento</label>
-                <input type="date"/>
-                <div className={styles.segura}>
-                    <Dropdown
-                        as="div"
-                        label={modo ? tipos.find(o => o.value === modo).label : "Categoria"}
-                        items={tipos}
-                        selected={modo}
-                        onSelect={setModo}
-                    />
+            <form onSubmit={registrarLote} className={styles.container}>
+
+                <label>Cadastrar Lote</label>
+
+                <div className={styles.cadLot}>
+                    <input type="text" placeholder="Lote do Fornecedor" className={styles.loteF}/>
+                    <input type="number" placeholder="Quantidade Total"/>
+                    <select name="status">
+                        <option value=""></option>
+                    </select>
+                    <label className={styles.label}>Data Do Recebimento</label>
+                    <input type="date"/>
+                    <div className={styles.segura}>
+                        <Dropdown
+                            as="div"
+                            label={modo ? situacao.find(o => o.value === modo).label : "Categoria"}
+                            items={situacao}
+                            selected={modo}
+                            onSelect={setModo}
+                        />
+                    </div>
+                    <select>
+                        <option>Adicionar lista de fornecedores quando tiver o db</option>
+                    </select>
                 </div>
-                <select>
-                    <option>Adicionar lista de fornecedores quando tiver o db</option>
-                </select>
                 <button type="submit" id="add" className={styles.add}>Confirmar Registro</button>
             </form>
         </>
