@@ -13,9 +13,9 @@ function adicionarLote(){
     ]
 
     const situacao = [
-        {value: "Ativo", label: "Ativo"},
-        {value: "Inspecao", label: "Em Inspeção"},
-        {value: "Bloqueado", label: "Bloqueado"}
+        {value: "ativo", label:"Ativo"},
+        {value: "inspecao", label:"Em inspeção"},
+        {value: "bloqueado", label:"Bloqueado"}
     ]
 
     function registrarLote(e){
@@ -40,16 +40,21 @@ function adicionarLote(){
                 <div className={styles.cadLot}>
                     <input type="text" placeholder="Lote do Fornecedor" className={styles.loteF}/>
                     <input type="number" placeholder="Quantidade Total"/>
-                    <select name="status">
-                        <option value=""></option>
-                    </select>
+                    <div className={styles.sdd}>
+                        <Dropdown
+                            as="div"
+                            name=""
+                            label="Situação"
+                            items={situacao}
+                        />
+                    </div>
                     <label className={styles.label}>Data Do Recebimento</label>
                     <input type="date"/>
                     <div className={styles.segura}>
                         <Dropdown
                             as="div"
-                            label={modo ? situacao.find(o => o.value === modo).label : "Categoria"}
-                            items={situacao}
+                            label={modo ? tipos.find(o => o.value === modo).label : "Categoria"}
+                            items={tipos}
                             selected={modo}
                             onSelect={setModo}
                         />
