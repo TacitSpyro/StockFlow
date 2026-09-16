@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from "react";
 import "./Dropdown.css";
 
-export default function Dropdown({ label, items, as: Tag = "li", onSelect, selected }) {
+export default function Dropdown({ label, items, as: Tag = "li", name, defaultValue }) {
   const [open, setOpen] = useState(false);
+  const [selected, setSelected] = useState(defaultValue ?? null);
   const ref = useRef(null);
 
   useEffect(() => {
@@ -14,12 +15,16 @@ export default function Dropdown({ label, items, as: Tag = "li", onSelect, selec
   }, []);
 
   function handleSelect(item) {
-    onSelect?.(item.value);
+    setSelected(item.value);
     setOpen(false);
   }
 
+  const selectedLabel = items.find((i) => i.value === selected)?.label;
+
   return (
     <Tag ref={ref} className="dropdown">
+      {name && <input type="hidden" name={name} value={selected ?? ""} />}
+
       <button
         type="button"
         className="dropdown-toggle"
@@ -27,7 +32,7 @@ export default function Dropdown({ label, items, as: Tag = "li", onSelect, selec
         aria-expanded={open}
         onClick={() => setOpen((p) => !p)}
       >
-        {label}
+        {selectedLabel ?? label}
       </button>
 
       {open && (
