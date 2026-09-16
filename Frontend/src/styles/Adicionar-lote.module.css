@@ -1,10 +1,13 @@
 .segura{
   display: flex;
-  padding: 0;
+  padding: 4px;
   width: fit-content;
   align-items: center;
-  background-color: #d9d9d9;
-  border-radius: 10px;
+  background-color: #fff;
+  border-radius: 20px;
+  margin-top: 3%;
+  border: solid 1px;
+  border-color: #a7a7a7;
 }
 
 
@@ -35,14 +38,50 @@ a{
     margin: 3% 0 0 3%;
 }
 
-.cadLot{
-    display: flex;
-}
-
 .loteF{
     margin-top: 3%;
 }
 
 .sdd{
-    
+    margin-top: 3%;
+    border: solid 1px;
+    border-color: #a7a7a7;
+    border-radius: 20px;
+    padding: 4px;
+}
+
+.quant{
+    margin-top: 3%;
+    max-width: 30%;
+}
+
+.linha1{
+    display: flex;
+    justify-content: space-between;
+    max-width: 50%;
+}
+
+.linha2{
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+}
+
+.linha3{
+    display: flex;
+    justify-content: space-between;
+}
+
+.linha4{
+    display: flex;
+    flex-direction: column;
+    max-width: fit-content;
+    margin-top: 3%;
+}
+
+.linha5{
+    margin-top: 3%;
+    display: flex;
+    flex-direction: column;
+    min-width: 17%;
 }
