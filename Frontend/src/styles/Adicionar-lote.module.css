@@ -2,17 +2,12 @@
   display: flex;
   padding: 4px;
   width: fit-content;
-  align-items: center;
-  background-color: #fff;
   border-radius: 20px;
-  margin-top: 3%;
+  align-self: center;
   border: solid 1px;
   border-color: #a7a7a7;
-}
-
-
-.label{
-    color: #fff;   
+  margin-right: 30%;
+  margin-left: 3%;
 }
 
 .topbar{
@@ -35,19 +30,32 @@ a{
     padding: 1.2rem;
     border-radius: 10px 0px 0px 10px;
     background-color: #fff;
-    margin: 3% 0 0 3%;
+    margin: 3% 0 0 10%;
 }
 
 .loteF{
+    margin-left: 3%;
     margin-top: 3%;
+    max-height: fit-content;
+    align-self: center;
+    font-size: 100%;
 }
 
 .sdd{
-    margin-top: 3%;
+    align-self: center;
     border: solid 1px;
     border-color: #a7a7a7;
     border-radius: 20px;
     padding: 4px;
+}
+
+.sdd2{
+    align-self: center;
+    border: solid 1px;
+    border-color: #a7a7a7;
+    border-radius: 20px;
+    padding: 4px;
+    margin-right: 10%;
 }
 
 .quant{
@@ -57,13 +65,10 @@ a{
 
 .linha1{
     display: flex;
-    justify-content: space-between;
-    max-width: 50%;
 }
 
 .linha2{
     display: flex;
-    flex-wrap: wrap;
     flex-direction: column;
 }
 
@@ -76,12 +81,34 @@ a{
     display: flex;
     flex-direction: column;
     max-width: fit-content;
-    margin-top: 3%;
+    align-self: center;
 }
 
 .linha5{
-    margin-top: 3%;
+    align-self: center;
     display: flex;
     flex-direction: column;
     min-width: 17%;
+}
+
+.data{
+    font-family: 'montserrat';
+    font-size: 100%;
+}
+
+.linha6{
+    display: flex;
+    flex-direction: column;
+    max-width: fit-content;
+}
+
+.campodata{
+    margin-top: 3%;
+    display: flex;
+    justify-content: space-between;
+    max-width: 70%;
+}
+
+.linha0{
+    display: flex;
 }
