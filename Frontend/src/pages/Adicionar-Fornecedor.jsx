@@ -1,11 +1,17 @@
 import styles from "../styles/Adicionar-fornecedor.module.css"
+import { useEmpresa } from "../context/EmpresaContext";
 
 function cadastrarFornecedor(){
+
+    const { idEmpresa } = useEmpresa();
 
     function calcularCep(e){
         e.preventDefault();
 
+        console.log(idEmpresa);
+
         alert("bom dia")
+
     }
 
     return(

@@ -2,8 +2,11 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "../styles/Login.module.css"
 import logo from "../assets/LogoDark.png"
+import { useEmpresa } from "../context/EmpresaContext";
 
 function Login() {
+
+  const { salvarIdEmpresa } = useEmpresa();
   const [codigo, setCodigo] = useState("")  
   const [usuario, setUsuario] = useState("");
   const [senha, setSenha] = useState("");
@@ -27,9 +30,8 @@ function Login() {
 
         const data = await response.json();
         
-        // Aqui a empresa existe, agora sim navega
+        salvarIdEmpresa(codigo);
         navigate("/home");
-        console.log({codigo})
 
       } catch (error) {
         console.error(error);
