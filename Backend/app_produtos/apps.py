@@ -1,6 +1,5 @@
 from django.apps import AppConfig
 
 
-class EstoqueConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'
+class AppProdutosConfig(AppConfig):
     name = 'app_produtos'

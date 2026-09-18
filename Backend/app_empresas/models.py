@@ -9,6 +9,7 @@ class Empresa(models.Model):
     endereco_emp = models.CharField(max_length=200)
     telefone_emp = models.CharField(max_length=20)
     email_emp = models.EmailField(max_length=100)
+    data_cadastro = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = "empresa"

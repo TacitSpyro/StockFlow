@@ -1,6 +1,5 @@
 from django.apps import AppConfig
 
 
-class ContasConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'
+class AppAdminConfig(AppConfig):
     name = 'app_admin'

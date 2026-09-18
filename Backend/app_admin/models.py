@@ -25,6 +25,7 @@ class Admin(models.Model):
     matricula = models.IntegerField()
     data_nasc = models.DateField()
     senha_hash = models.CharField(max_length=255, blank=True, null=True)
+    data_cadastro = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = "admin"

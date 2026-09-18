@@ -15,6 +15,7 @@ class Produto(models.Model):
     nome_prod = models.CharField(max_length=150, blank=True, null=True)
     valor_prod = models.IntegerField(blank=True, null=True)
     quantidade_estoque = models.IntegerField(blank=True, null=True)
+    data_cadastro = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = "produto"

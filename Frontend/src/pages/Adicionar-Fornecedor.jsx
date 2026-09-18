@@ -22,6 +22,12 @@ function cadastrarFornecedor(){
                         <input type="text" placeholder="CEP" />
                         <button type="button" onClick={calcularCep}>Calcular Endereço</button>
                     </div>
+                    <div className={styles.secao2}>
+                        <div className={styles.coluna3}>
+                            <input type="text" placeholder="Nome do Responsável"/>
+                            <input type="number" placeholder="Telefone"/>
+                        </div>
+                    </div>
                 </div>
             </main>
         </>
