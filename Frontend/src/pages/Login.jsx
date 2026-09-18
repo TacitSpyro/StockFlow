@@ -9,16 +9,33 @@ function Login() {
   const [senha, setSenha] = useState("");
   const navigate = useNavigate();
 
-  function handleLogin(e) {
+  async function handleLogin(e) {
     e.preventDefault();
 
-    // Validação de login aqui, futuramente talvez
-    if (codigo && usuario && senha) {
-      navigate("/home");
-    } else {
-      alert("Preencha usuário e senha");
+      if (!codigo || !usuario || !senha) {
+        alert("Preencha todos os campos");
+        return;
+      }
+
+      try {
+        const response = await fetch(`http://localhost:8000/api/empresa/${codigo}/verificar/`);
+        
+        if (!response.ok) {
+          alert("Código da empresa não encontrado");
+          return;
+        }
+
+        const data = await response.json();
+        
+        // Aqui a empresa existe, agora sim navega
+        navigate("/home");
+        console.log({codigo})
+
+      } catch (error) {
+        console.error(error);
+        alert("Erro ao conectar com o servidor");
+      }
     }
-  }
 
   return (
 

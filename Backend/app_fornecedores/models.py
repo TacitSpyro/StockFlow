@@ -19,6 +19,7 @@ class Fornecedor(models.Model):
     telefone_fn = models.CharField(max_length=20)
     email_fn = models.EmailField(max_length=100)
     contato_resp = models.CharField(max_length=20, blank=True, null=True)
+    data_cadastro = models.DateTimeField(auto_now_add=True)
 
     produtos = models.ManyToManyField(
         Produto,
@@ -34,6 +35,7 @@ class Fornecedor(models.Model):
 
 
 class FornecimentoProduto(models.Model):
+    """Tabela intermediária, qual fornecedor fornece qual produto em qual empresa"""
     id_fornecimento = models.AutoField(primary_key=True)
     fornecedor = models.ForeignKey(
         Fornecedor,
@@ -53,6 +55,7 @@ class FornecimentoProduto(models.Model):
         db_column="id_empresa",
         related_name="fornecimentos",
     )
+    data_cadastro = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = "fornecimento_produto"
