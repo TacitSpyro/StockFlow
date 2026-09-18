@@ -1,0 +1,13 @@
+.secao1{
+    display: flex;
+}
+
+.coluna1{
+    display: flex;
+    flex-direction: column;
+}
+
+.coluna2{
+    display: flex;
+    flex-direction: column;
+}
