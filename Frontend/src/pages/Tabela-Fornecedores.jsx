@@ -1,25 +1,28 @@
 import TabelaBase from "../components/modeloTable";
 
 const opcoesOrdenacao = [
-    { value: "alfabeto", label: "Ordem Alfabética" },
-    { value: "recente", label: "Mais Recente Registrado" },
-    { value: "antigo", label: "Mais Antigo Registrado" }
+    { value: "decrescente", label: "Ordem Decrescente" },
+    { value: "crescente", label: "Ordem Crescente" },
+    { value: "recente", label: "Mais Recente" },
+    { value: "antigo", label: "Mais Antigo" }
 ]
-
 
 function TabelaFornecedores() {
     return (
         <TabelaBase
-            titulo="Fornecedores Registrados"
+            titulo="Fornecedores Cadastrados"
+            tipo="fornecedor"
             opcoesOrdenacao={opcoesOrdenacao}
-            modoInicial="alfabeto"
-            edicao= {false}
+            modoInicial="recente"
+            edicao={false}
             texto="Adicionar Fornecedor"
             colunas={[
-                { key: "nome", label: "Nome" },
-                { key: "cnpj", label: "CNPJ" },
-                { key: "telefone", label: "Telefone" },
+                { key: "nome_fantasia_fn", label: "Nome Fantasia" },
+                { key: "cnpj_fn", label: "CNPJ" },
+                { key: "cidade", label: "Cidade" },
+                { key: "telefone_fn", label: "Telefone" },
             ]}
+            campoOrdenacao="data_cadastro"
         />
     )
 }

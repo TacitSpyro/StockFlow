@@ -1,44 +1,98 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Dropdown from "../components/Dropdown";
 import "./modeloTable.css"
 import Logout from "../assets/Logout.png"
-import { Navigate } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { useEmpresa } from "../context/EmpresaContext";
+
+const ENDPOINTS = {
+    produto: (idEmpresa) => `http://localhost:8000/api/empresa/${idEmpresa}/produtos/`,
+    fornecedor: (idEmpresa) => `http://localhost:8000/api/empresa/${idEmpresa}/fornecedores/`,
+};
+
+function ordenarLinhas(linhas, modo, campoOrdenacao) {
+    const copia = [...linhas];
+
+    switch (modo) {
+        case "crescente":
+            return copia.sort((a, b) =>
+                String(a.nome ?? a.nome_fantasia_fn ?? "").localeCompare(String(b.nome ?? b.nome_fantasia_fn ?? ""))
+            );
+        case "decrescente":
+            return copia.sort((a, b) =>
+                String(b.nome ?? b.nome_fantasia_fn ?? "").localeCompare(String(a.nome ?? a.nome_fantasia_fn ?? ""))
+            );
+        case "recente":
+            return copia.sort((a, b) => new Date(b[campoOrdenacao]) - new Date(a[campoOrdenacao]));
+        case "antigo":
+            return copia.sort((a, b) => new Date(a[campoOrdenacao]) - new Date(b[campoOrdenacao]));
+        default:
+            return copia;
+    }
+}
 
 function TabelaBase({
     titulo,
+    tipo,
     opcoesOrdenacao,
     modoInicial,
     edicao,
     texto,
-    urlDoCoiso
+    urlDoCoiso,
+    colunas,
+    campoOrdenacao,
 }) {
 
-     const navigate = useNavigate();
+    const navigate = useNavigate();
+    const { idEmpresa } = useEmpresa();
 
-        function handleEditar(e){
-            e.preventDefault();
+    function handleEditar(e) {
+        e.preventDefault();
+        navigate(urlDoCoiso);
+    }
 
-            console.log(urlDoCoiso)
+    const [modo, setModo] = useState(modoInicial || opcoesOrdenacao[0]?.value)
+    const [linhas, setLinhas] = useState([]);
+    const [carregando, setCarregando] = useState(false);
+    const [erro, setErro] = useState(null);
 
-            navigate(urlDoCoiso);
-        }
+    // Busca os dados do backend (só depende do tipo e idEmpresa, não do modo de ordenação)
+    useEffect(() => {
+        if (!idEmpresa || !tipo) return;
 
-        const [modo, setModo] = useState(modoInicial || opcoesOrdenacao[0]?.value)
+        const endpointFn = ENDPOINTS[tipo];
+        if (!endpointFn) return;
 
+        setCarregando(true);
+        setErro(null);
+
+        fetch(endpointFn(idEmpresa))
+            .then((res) => {
+                if (!res.ok) throw new Error("Erro ao buscar dados");
+                return res.json();
+            })
+            .then((data) => setLinhas(data))
+            .catch((err) => {
+                console.error(err);
+                setErro("Não foi possível carregar os dados");
+                setLinhas([]);
+            })
+            .finally(() => setCarregando(false));
+
+    }, [tipo, idEmpresa]);
+
+    // Ordena localmente sempre que o modo mudar (sem precisar buscar de novo)
+    const linhasOrdenadas = ordenarLinhas(linhas, modo, campoOrdenacao);
 
     return (
         <>
             <div className="topbar">
-                
                 <div className="segura">
                     <img src={Logout} alt="desloga" className="img-Table"/>
                     <a href="/" className="-a">Desconectar</a>
                 </div>
-                
 
-                
-                { edicao ? ( 
+                { edicao ? (
                     <button type="button" className="botaoEditar" onClick={handleEditar}>
                         {texto}
                     </button>
@@ -46,11 +100,6 @@ function TabelaBase({
             </div>
             <main className="main">
                 <label htmlFor="fo">{titulo}</label>
-
-                {/* isso é uma pratica horrivel de código mas eu não tenho paciencia pra deixar um projeto tão frivolo
-                como esse absolutamente perfeito, assim eu altero o estilo só da div sem mexer com o css do Dropdown
-                pq meu cerebro não pode conceber de que maneira eu alteraria a posição do dropdown exclusivamente 
-                nessa pagina, seje grato que eu não vou criar um dropdown igual só com textos diferentes pra cada pagina */}
 
                 <div className={"sdd"}>
                     <Dropdown
@@ -61,6 +110,38 @@ function TabelaBase({
                         onSelect={setModo}
                     />
                 </div>
+
+                {carregando && <p>Carregando...</p>}
+                {erro && <p>{erro}</p>}
+
+                {!carregando && !erro && (
+                    <table>
+                        <thead>
+                            <tr>
+                                {colunas.map((col) => (
+                                    <th key={col.key}>{col.label}</th>
+                                ))}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {linhasOrdenadas.length === 0 ? (
+                                <tr>
+                                    <td colSpan={colunas.length}>Nenhum registro encontrado</td>
+                                </tr>
+                            ) : (
+                                linhasOrdenadas.map((linha, i) => (
+                                    <tr key={linha.id ?? linha.id_fornecedor ?? i}>
+                                        {colunas.map((col) => (
+                                            <td key={col.key}>
+                                                {String(linha[col.key] ?? "")}
+                                            </td>
+                                        ))}
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
+                )}
             </main>
         </>
     )
