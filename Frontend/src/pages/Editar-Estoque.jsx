@@ -11,16 +11,19 @@ function TabelaProdutos() {
     return (
         <TabelaBase
             titulo="Lotes Registrados"
+            tipo="produto"
             opcoesOrdenacao={opcoesOrdenacao}
             modoInicial="recente"
-            edicao= {true}
-            urlDoCoiso={"/cadastrar/lote"}
+            edicao={false}
             texto="Adicionar Lote"
             colunas={[
                 { key: "nome", label: "Produto" },
-                { key: "preco", label: "Preço" },
-                { key: "estoque", label: "Estoque" },
+                { key: "lote", label: "Lote" },
+                { key: "estoque_atual", label: "Estoque Atual" },
+                { key: "situacao", label: "Situação" },
+                { key: "data_fabricacao", label: "Data Fabricação" },
             ]}
+            campoOrdenacao="data_fabricacao"
         />
     )
 }
