@@ -1,9 +1,17 @@
 import Dropdown from "../components/Dropdown";
-import { useState } from "react";
+import { useState, useEffect} from "react";
 import styles from "../styles/Adicionar-lote.module.css";
 import retornar from "../assets/Retornar.png"
+import { useEmpresa } from "../context/EmpresaContext";
 
 function adicionarLote(){
+
+    const { idEmpresa } = useEmpresa();
+
+    const [fornecedores, setFornecedores] = useState([]);
+    const [fornecedorSelecionado, setFornecedorSelecionado] = useState(null);
+    const [carregando, setCarregando] = useState(false);
+    const [erro, setErro] = useState(null);
 
     const tipos = [
         {value: "madeira", label:"Madeira"},
@@ -50,6 +58,33 @@ function adicionarLote(){
         alert("ta funfando");
     }
 
+     useEffect(() => {
+        if (!idEmpresa) return;
+
+        setCarregando(true);
+        setErro(null);
+
+        fetch(`http://localhost:8000/api/empresa/${idEmpresa}/fornecedores/`)
+            .then((res) => {
+                if (!res.ok) throw new Error("Erro ao buscar fornecedores");
+                return res.json();
+            })
+            .then((data) => {
+                // Transforma os dados do backend no formato que o Dropdown espera
+                const opcoes = data.map((f) => ({
+                    value: f.id_fornecedor,
+                    label: f.razao_social_fn,
+                }));
+                setFornecedores(opcoes);
+            })
+            .catch((err) => {
+                console.error(err);
+                setErro("Não foi possível carregar os fornecedores");
+                setFornecedores([]);
+            })
+            .finally(() => setCarregando(false));
+
+    }, [idEmpresa]);
 
     return(
         <>
@@ -92,14 +127,26 @@ function adicionarLote(){
                             <label>Data de Registro</label>
                             <input type="date" className={styles.data}/>
                         </div>
-                        <div className={styles.sdd2}>
-                            <Dropdown
-                                as="div"
-                                name=""
-                                label="Fornecido por:"
-                                items={fornecedor}
-                            />
-                        </div>
+                        <div>
+            <label htmlFor="fornecedor">Fornecedor</label>
+
+            {carregando && <p>Carregando fornecedores...</p>}
+            {erro && <p>{erro}</p>}
+
+            {!carregando && !erro && (
+                <Dropdown
+                    as="div"
+                    label={
+                        fornecedorSelecionado
+                            ? fornecedores.find(f => f.value === fornecedorSelecionado)?.label
+                            : "Selecione um fornecedor"
+                    }
+                    items={fornecedores}
+                    selected={fornecedorSelecionado}
+                    onSelect={setFornecedorSelecionado}
+                />
+            )}
+        </div>
                     </div>
                     <div className={styles.campodata}>
                         <div className={styles.linha6}>

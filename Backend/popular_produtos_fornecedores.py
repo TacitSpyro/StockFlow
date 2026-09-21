@@ -1,16 +1,25 @@
 from datetime import date
 from app_empresas.models import Empresa
-from app_produtos.models import Produto
+from app_produtos.models import Produto, CatalogoProduto
 from app_fornecedores.models import Fornecedor
-
 
 empresas = list(Empresa.objects.all()[:2])
 empresa1 = empresas[0]
 empresa2 = empresas[1] if len(empresas) > 1 else empresas[0]
 
+# Busca o catálogo e fornecedores já cadastrados
+catalogo_arroz = CatalogoProduto.objects.get(nome="Arroz Branco Tipo 1")
+catalogo_feijao = CatalogoProduto.objects.get(nome="Feijão Carioca")
+catalogo_oleo = CatalogoProduto.objects.get(nome="Óleo de Soja")
+catalogo_acucar = CatalogoProduto.objects.get(nome="Açúcar Refinado")
+
+fornecedor1 = Fornecedor.objects.get(nome_fantasia_fn="Alimentos Norte")
+fornecedor3 = Fornecedor.objects.get(nome_fantasia_fn="Óleos do Sul")
+
 produtos = [
     Produto.objects.create(
-        nome="Arroz Branco Tipo 1",
+        catalogo=catalogo_arroz,
+        fornecedor=fornecedor1,
         lote="LOTE-A001",
         empresa=empresa1,
         estoque_atual=120,
@@ -23,7 +32,8 @@ produtos = [
         descricao="Pacote de 5kg",
     ),
     Produto.objects.create(
-        nome="Feijão Carioca",
+        catalogo=catalogo_feijao,
+        fornecedor=fornecedor1,
         lote="LOTE-A002",
         empresa=empresa1,
         estoque_atual=45,
@@ -36,7 +46,8 @@ produtos = [
         descricao="Pacote de 1kg",
     ),
     Produto.objects.create(
-        nome="Óleo de Soja",
+        catalogo=catalogo_oleo,
+        fornecedor=fornecedor3,
         lote="LOTE-B010",
         empresa=empresa2,
         estoque_atual=10,
@@ -49,7 +60,8 @@ produtos = [
         descricao="Garrafa 900ml, lote com avaria no transporte",
     ),
     Produto.objects.create(
-        nome="Açúcar Refinado",
+        catalogo=catalogo_acucar,
+        fornecedor=fornecedor3,
         lote="LOTE-B011",
         empresa=empresa2,
         estoque_atual=88,
@@ -64,60 +76,3 @@ produtos = [
 ]
 
 print(f"{Produto.objects.count()} produtos cadastrados!")
-
-
-fornecedores = [
-    Fornecedor.objects.create(
-        empresa=empresa1,
-        razao_social_fn="Distribuidora Alimentos Norte Ltda",
-        nome_fantasia_fn="Alimentos Norte",
-        cnpj_fn="11.222.333/0001-44",
-        cep="01310-100",
-        logradouro="Av. Paulista",
-        bairro="Bela Vista",
-        cidade="São Paulo",
-        uf="SP",
-        numero="1000",
-        complemento="Galpão 3",
-        email_fn="contato@alimentosnorte.com.br",
-        nome_responsavel="Ricardo Nunes",
-        telefone_fn="(11) 3344-5566",
-        ativo=True,
-    ),
-    Fornecedor.objects.create(
-        empresa=empresa1,
-        razao_social_fn="Grãos & Cia Comércio Ltda",
-        nome_fantasia_fn="Grãos & Cia",
-        cnpj_fn="22.333.444/0001-55",
-        cep="80010-000",
-        logradouro="Rua XV de Novembro",
-        bairro="Centro",
-        cidade="Curitiba",
-        uf="PR",
-        numero="250",
-        complemento="",
-        email_fn="vendas@graosecia.com.br",
-        nome_responsavel="Ana Paula Reis",
-        telefone_fn="(41) 3222-1199",
-        ativo=True,
-    ),
-    Fornecedor.objects.create(
-        empresa=empresa2,
-        razao_social_fn="Óleos e Derivados do Sul S.A.",
-        nome_fantasia_fn="Óleos do Sul",
-        cnpj_fn="33.444.555/0001-66",
-        cep="90020-000",
-        logradouro="Av. Borges de Medeiros",
-        bairro="Centro Histórico",
-        cidade="Porto Alegre",
-        uf="RS",
-        numero="500",
-        complemento="Sala 12",
-        email_fn="comercial@oleosdosul.com.br",
-        nome_responsavel="Fernando Costa",
-        telefone_fn="(51) 3011-2233",
-        ativo=True,
-    ),
-]
-
-print(f"{Fornecedor.objects.count()} fornecedores cadastrados!")

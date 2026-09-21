@@ -14,8 +14,9 @@ function TabelaProdutos() {
             tipo="produto"
             opcoesOrdenacao={opcoesOrdenacao}
             modoInicial="recente"
-            edicao={false}
+            edicao={true}
             texto="Adicionar Lote"
+            urlDoCoiso={"/cadastrar/lote"}
             colunas={[
                 { key: "nome", label: "Produto" },
                 { key: "lote", label: "Lote" },
