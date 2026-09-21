@@ -14,8 +14,9 @@ function TabelaFornecedores() {
             tipo="fornecedor"
             opcoesOrdenacao={opcoesOrdenacao}
             modoInicial="recente"
-            edicao={false}
+            edicao={true}
             texto="Adicionar Fornecedor"
+            urlDoCoiso={"/cadastrar/fornecedor"}
             colunas={[
                 { key: "nome_fantasia_fn", label: "Nome Fantasia" },
                 { key: "cnpj_fn", label: "CNPJ" },

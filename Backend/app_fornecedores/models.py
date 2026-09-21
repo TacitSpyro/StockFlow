@@ -1,7 +1,7 @@
 from django.db import models
 
 from app_empresas.models import Empresa
-from app_produtos.models import Produto
+from app_produtos.models import CatalogoProduto
 
 
 class Fornecedor(models.Model):
@@ -34,8 +34,7 @@ class Fornecedor(models.Model):
     data_cadastro = models.DateTimeField(auto_now_add=True)
 
     produtos = models.ManyToManyField(
-        Produto,
-        through="FornecimentoProduto",
+        CatalogoProduto,
         related_name="fornecedores",
     )
 
@@ -49,22 +48,3 @@ class Fornecedor(models.Model):
 
     def __str__(self):
         return self.nome_fantasia_fn
-
-class FornecimentoProduto(models.Model):
-    id = models.AutoField(primary_key=True)
-    fornecedor = models.ForeignKey(
-        Fornecedor,
-        on_delete=models.CASCADE,
-    )
-    produto = models.ForeignKey(
-        Produto,
-        on_delete=models.CASCADE,
-    )
-    data_fornecimento = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        db_table = "fornecimento_produto"
-        unique_together = ("fornecedor", "produto")
-
-    def __str__(self):
-        return f"{self.fornecedor.nome_fantasia_fn} → {self.produto.nome}"
