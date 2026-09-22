@@ -1,10 +1,10 @@
 import Dropdown from "../components/Dropdown";
-import { useState, useEffect} from "react";
+import { useState, useEffect } from "react";
 import styles from "../styles/Adicionar-lote.module.css";
 import retornar from "../assets/Retornar.png"
 import { useEmpresa } from "../context/EmpresaContext";
 
-function adicionarLote(){
+function AdicionarLote() {
 
     const { idEmpresa } = useEmpresa();
 
@@ -13,10 +13,10 @@ function adicionarLote(){
     const [carregando, setCarregando] = useState(false);
     const [erro, setErro] = useState(null);
 
-    const tipos = [
-        {value: "madeira", label:"Madeira"},
-        {value: "ferro", label:"Ferro"}
-    ]
+    // Novo estado: produtos do catálogo do fornecedor escolhido
+    const [tipos, setTipos] = useState([]);
+    const [materialSelecionado, setMaterialSelecionado] = useState(null);
+    const [carregandoTipos, setCarregandoTipos] = useState(false);
 
     const situacao = [
         {value: "ativo", label:"Ativo"},
@@ -24,12 +24,8 @@ function adicionarLote(){
         {value: "bloqueado", label:"Bloqueado"}
     ]
 
-    const fornecedor = [
-        {value: "não tem", label:"adicionar quando tive cadastro no db"}
-    ]
-
     const ala = [
-        {value: "A", label:"Ala 'B'"},
+        {value: "A", label:"Ala 'A'"},
         {value: "B", label:"Ala 'B'"},
         {value: "C", label:"Ala 'C'"}
     ]
@@ -52,13 +48,15 @@ function adicionarLote(){
         {value: "8", label:"Oitava"}
     ]
 
-    function registrarLote(e){
+    function registrarLote(e) {
         e.preventDefault();
-
         alert("ta funfando");
     }
 
-     useEffect(() => {
+
+    
+    // Busca a lista de fornecedores da empresa (já existia)
+    useEffect(() => {
         if (!idEmpresa) return;
 
         setCarregando(true);
@@ -70,7 +68,6 @@ function adicionarLote(){
                 return res.json();
             })
             .then((data) => {
-                // Transforma os dados do backend no formato que o Dropdown espera
                 const opcoes = data.map((f) => ({
                     value: f.id_fornecedor,
                     label: f.razao_social_fn,
@@ -86,13 +83,43 @@ function adicionarLote(){
 
     }, [idEmpresa]);
 
-    return(
+    // Novo: busca o catálogo do fornecedor sempre que ele mudar
+    useEffect(() => {
+        if (!fornecedorSelecionado) {
+            setTipos([]);
+            setMaterialSelecionado(null);
+            return;
+        }
+
+        setCarregandoTipos(true);
+        setMaterialSelecionado(null); // limpa a escolha anterior, já que a lista muda
+
+        fetch(`http://localhost:8000/api/fornecedor/${fornecedorSelecionado}/catalogo/`)
+            .then((res) => {
+                if (!res.ok) throw new Error("Erro ao buscar catálogo do fornecedor");
+                return res.json();
+            })
+            .then((data) => {
+                const opcoes = data.map((p) => ({
+                    value: p.id,
+                    label: p.nome,
+                }));
+                setTipos(opcoes);
+            })
+            .catch((err) => {
+                console.error(err);
+                setTipos([]);
+            })
+            .finally(() => setCarregandoTipos(false));
+
+    }, [fornecedorSelecionado]);
+
+    return (
         <>
             <div className={styles.topbar}>
                 <img src={retornar} alt="retornar" className="navbar-img"/>
                 <a href="/edição/produtos">Cancelar</a>
             </div>
-
 
             <form onSubmit={registrarLote} className={styles.container}>
 
@@ -101,13 +128,47 @@ function adicionarLote(){
                 <div className={styles.cadLot}>
                     <div className={styles.linha1}>
                         <div className={styles.segura}>
-                            <Dropdown
-                                as="div"
-                                name=""
-                                label="Material"
-                                items={tipos}
-                            />
-                    </div>
+                            <label htmlFor="fornecedor">Fornecedor</label>
+
+                            {carregando && <p>Carregando fornecedores...</p>}
+                            {erro && <p>{erro}</p>}
+
+                            {!carregando && !erro && (
+                                <Dropdown
+                                    as="div"
+                                    label={
+                                        fornecedorSelecionado
+                                            ? fornecedores.find(f => f.value === fornecedorSelecionado)?.label
+                                            : "Selecione um fornecedor"
+                                    }
+                                    items={fornecedores}
+                                    selected={fornecedorSelecionado}
+                                    onSelect={setFornecedorSelecionado}
+                                />
+                            )}
+                        </div>
+
+                        <div className={styles.segura}>
+                            <label htmlFor="material">Material</label>
+
+                            {!fornecedorSelecionado && <p>Selecione um fornecedor primeiro</p>}
+                            {carregandoTipos && <p>Carregando produtos...</p>}
+
+                            {fornecedorSelecionado && !carregandoTipos && (
+                                <Dropdown
+                                    as="div"
+                                    label={
+                                        materialSelecionado
+                                            ? tipos.find(t => t.value === materialSelecionado)?.label
+                                            : "Selecione um material"
+                                    }
+                                    items={tipos}
+                                    selected={materialSelecionado}
+                                    onSelect={setMaterialSelecionado}
+                                />
+                            )}
+                        </div>
+
                         <div className={styles.linha2}>
                             <label>Quantidade Total</label>
                             <input type="number" placeholder="0/100" className={styles.quant}/>
@@ -127,26 +188,6 @@ function adicionarLote(){
                             <label>Data de Registro</label>
                             <input type="date" className={styles.data}/>
                         </div>
-                        <div>
-            <label htmlFor="fornecedor">Fornecedor</label>
-
-            {carregando && <p>Carregando fornecedores...</p>}
-            {erro && <p>{erro}</p>}
-
-            {!carregando && !erro && (
-                <Dropdown
-                    as="div"
-                    label={
-                        fornecedorSelecionado
-                            ? fornecedores.find(f => f.value === fornecedorSelecionado)?.label
-                            : "Selecione um fornecedor"
-                    }
-                    items={fornecedores}
-                    selected={fornecedorSelecionado}
-                    onSelect={setFornecedorSelecionado}
-                />
-            )}
-        </div>
                     </div>
                     <div className={styles.campodata}>
                         <div className={styles.linha6}>
@@ -165,4 +206,4 @@ function adicionarLote(){
     )
 }
 
-export default adicionarLote;
+export default AdicionarLote;

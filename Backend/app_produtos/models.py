@@ -1,5 +1,6 @@
 from django.db import models
 from app_empresas.models import Empresa
+from app_admin.models import Admin
 
 
 class CatalogoProduto(models.Model):
@@ -40,6 +41,13 @@ class Produto(models.Model):
         "app_fornecedores.Fornecedor",
         on_delete=models.PROTECT,
         related_name="lotes_fornecidos",
+    )
+    cadastrado_por = models.ForeignKey(
+        Admin,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="produtos_cadastrados",
     )
 
     lote = models.CharField(max_length=50)

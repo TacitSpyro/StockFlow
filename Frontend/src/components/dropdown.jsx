@@ -1,10 +1,13 @@
 import { useState, useRef, useEffect } from "react";
 import "./Dropdown.css";
 
-export default function Dropdown({ label, items, as: Tag = "li", name, defaultValue }) {
+export default function Dropdown({ label, items, as: Tag = "li", name, defaultValue, selected: selectedProp, onSelect }) {
   const [open, setOpen] = useState(false);
-  const [selected, setSelected] = useState(defaultValue ?? null);
+  const [selectedInterno, setSelectedInterno] = useState(defaultValue ?? null);
   const ref = useRef(null);
+
+  // Se vier "selected" via prop (modo controlado), usa ele; senão usa o estado interno
+  const selected = selectedProp !== undefined ? selectedProp : selectedInterno;
 
   useEffect(() => {
     function handleClickOutside(e) {
@@ -15,8 +18,12 @@ export default function Dropdown({ label, items, as: Tag = "li", name, defaultVa
   }, []);
 
   function handleSelect(item) {
-    setSelected(item.value);
+    setSelectedInterno(item.value); // continua funcionando pros casos sem onSelect
     setOpen(false);
+
+    if (onSelect) {
+      onSelect(item.value); // avisa o componente pai, se ele estiver escutando
+    }
   }
 
   const selectedLabel = items.find((i) => i.value === selected)?.label;

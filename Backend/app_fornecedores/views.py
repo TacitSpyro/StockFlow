@@ -36,3 +36,14 @@ def listar_fornecedores(request, id_empresa):
     fornecedores = Fornecedor.objects.filter(empresa_id=id_empresa)
     serializer = FornecedorSerializer(fornecedores, many=True)
     return Response(serializer.data)
+
+@api_view(['GET'])
+def catalogo_do_fornecedor(request, id_fornecedor):
+    try:
+        fornecedor = Fornecedor.objects.get(id_fornecedor=id_fornecedor)
+    except Fornecedor.DoesNotExist:
+        return Response({"erro": "Fornecedor não encontrado"}, status=404)
+
+    catalogo = fornecedor.produtos.all()  # os CatalogoProduto vinculados a ele
+    data = [{"id": p.id, "nome": p.nome} for p in catalogo]
+    return Response(data)

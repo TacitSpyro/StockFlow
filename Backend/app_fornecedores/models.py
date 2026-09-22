@@ -1,5 +1,6 @@
 from django.db import models
 
+from app_admin.models import Admin
 from app_empresas.models import Empresa
 from app_produtos.models import CatalogoProduto
 
@@ -11,6 +12,13 @@ class Fornecedor(models.Model):
         on_delete=models.CASCADE,
         db_column="id_empresa",
         related_name="fornecedores",
+    )
+    cadastrado_por = models.ForeignKey(
+        Admin,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="fornecedores_cadastrados",
     )
 
     razao_social_fn = models.CharField(max_length=150)
