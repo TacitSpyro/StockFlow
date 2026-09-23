@@ -135,6 +135,11 @@ def criar_fornecedor(request):
         ativo=dados.get("ativo", True),
         cadastrado_por=admin,
     )
+    ids_produtos = dados.get("produtos_ids", [])
+    if ids_produtos:
+        fornecedor.produtos.set(ids_produtos)
+
+    return Response({"id_fornecedor": fornecedor.id_fornecedor})
 
     return Response({
         "id_fornecedor": fornecedor.id_fornecedor,
