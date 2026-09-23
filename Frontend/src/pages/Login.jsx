@@ -38,7 +38,7 @@ function Login() {
         return;
       }
 
-      // Salva empresa e admin no Context (e localStorage)
+      // Salva empresa e admin como var "superGlobal"
       salvarIdEmpresa(data.id_empresa);
       salvarAdmin({ id_admin: data.id_admin, matricula: data.matricula });
 

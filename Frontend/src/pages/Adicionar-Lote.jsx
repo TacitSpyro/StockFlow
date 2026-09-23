@@ -2,26 +2,42 @@ import Dropdown from "../components/Dropdown";
 import { useState, useEffect } from "react";
 import styles from "../styles/Adicionar-lote.module.css";
 import retornar from "../assets/Retornar.png"
+import { useNavigate } from "react-router-dom";
 import { useEmpresa } from "../context/EmpresaContext";
 
 function AdicionarLote() {
 
-    const { idEmpresa } = useEmpresa();
+    const { idEmpresa, idAdmin } = useEmpresa();
+    const navigate = useNavigate();
 
     const [fornecedores, setFornecedores] = useState([]);
     const [fornecedorSelecionado, setFornecedorSelecionado] = useState(null);
     const [carregando, setCarregando] = useState(false);
     const [erro, setErro] = useState(null);
 
-    // Novo estado: produtos do catálogo do fornecedor escolhido
     const [tipos, setTipos] = useState([]);
     const [materialSelecionado, setMaterialSelecionado] = useState(null);
     const [carregandoTipos, setCarregandoTipos] = useState(false);
 
+    const [situacaoSelecionada, setSituacaoSelecionada] = useState(null);
+    const [alaSelecionada, setAlaSelecionada] = useState(null);
+    const [secaoSelecionada, setSecaoSelecionada] = useState(null);
+    const [prateleiraSelecionada, setPrateleiraSelecionada] = useState(null);
+
+    const [form, setForm] = useState({
+        lote: "",
+        estoque_atual: "",
+        estoque_capacidade: "",
+        data_fabricacao: "",
+        data_encerramento: "",
+        descricao: "",
+    });
+
     const situacao = [
-        {value: "ativo", label:"Ativo"},
-        {value: "inspecao", label:"Em inspeção"},
-        {value: "bloqueado", label:"Bloqueado"}
+        {value: "ATIVO", label:"Ativo"},
+        {value: "INSPECAO", label:"Em inspeção"},
+        {value: "BLOQUEIO", label:"Bloqueado"},
+        {value: "ENCERRADO", label:"Encerrado"},
     ]
 
     const ala = [
@@ -48,14 +64,10 @@ function AdicionarLote() {
         {value: "8", label:"Oitava"}
     ]
 
-    function registrarLote(e) {
-        e.preventDefault();
-        alert("ta funfando");
+    function atualizarCampo(campo, valor) {
+        setForm((prev) => ({ ...prev, [campo]: valor }));
     }
 
-
-    
-    // Busca a lista de fornecedores da empresa (já existia)
     useEffect(() => {
         if (!idEmpresa) return;
 
@@ -83,7 +95,6 @@ function AdicionarLote() {
 
     }, [idEmpresa]);
 
-    // Novo: busca o catálogo do fornecedor sempre que ele mudar
     useEffect(() => {
         if (!fornecedorSelecionado) {
             setTipos([]);
@@ -92,7 +103,7 @@ function AdicionarLote() {
         }
 
         setCarregandoTipos(true);
-        setMaterialSelecionado(null); // limpa a escolha anterior, já que a lista muda
+        setMaterialSelecionado(null);
 
         fetch(`http://localhost:8000/api/fornecedor/${fornecedorSelecionado}/catalogo/`)
             .then((res) => {
@@ -113,6 +124,47 @@ function AdicionarLote() {
             .finally(() => setCarregandoTipos(false));
 
     }, [fornecedorSelecionado]);
+
+    async function registrarLote(e) {
+        e.preventDefault();
+
+        if (!fornecedorSelecionado || !materialSelecionado || !situacaoSelecionada) {
+            alert("Preencha fornecedor, material e situação");
+            return;
+        }
+
+        try {
+            const response = await fetch("http://localhost:8000/api/produto/criar/", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    ...form,
+                    catalogo: materialSelecionado,
+                    fornecedor: fornecedorSelecionado,
+                    situacao: situacaoSelecionada,
+                    ala: alaSelecionada,
+                    secao: secaoSelecionada,
+                    prateleira: prateleiraSelecionada,
+                    id_empresa: idEmpresa,
+                    id_admin: idAdmin,
+                }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                alert(data.erro || "Erro ao registrar lote");
+                return;
+            }
+
+            alert("Lote registrado com sucesso!");
+            navigate("/edição/produtos");
+
+        } catch (error) {
+            console.error(error);
+            alert("Erro ao conectar com o servidor");
+        }
+    }
 
     return (
         <>
@@ -170,33 +222,127 @@ function AdicionarLote() {
                         </div>
 
                         <div className={styles.linha2}>
-                            <label>Quantidade Total</label>
-                            <input type="number" placeholder="0/100" className={styles.quant}/>
+                            <label>Estoque Atual</label>
+                            <input
+                                type="number"
+                                placeholder="0"
+                                className={styles.quant}
+                                value={form.estoque_atual}
+                                onChange={(e) => atualizarCampo("estoque_atual", e.target.value)}
+                            />
+                            <label>Capacidade</label>
+                            <input
+                                type="number"
+                                placeholder="100"
+                                className={styles.quant}
+                                value={form.estoque_capacidade}
+                                onChange={(e) => atualizarCampo("estoque_capacidade", e.target.value)}
+                            />
                         </div>
+
                         <div className={styles.sdd}>
+                            <label htmlFor="situacao">Situação</label>
                             <Dropdown
                                 as="div"
-                                name=""
-                                label="Situação"
+                                label={
+                                    situacaoSelecionada
+                                        ? situacao.find(s => s.value === situacaoSelecionada)?.label
+                                        : "Situação"
+                                }
                                 items={situacao}
+                                selected={situacaoSelecionada}
+                                onSelect={setSituacaoSelecionada}
                             />
                         </div>
                     </div>
-                    <div className={styles.linha3}>
-                        <input type="text" placeholder="Lote do Fornecedor" className={styles.loteF}/>
+
+                    
+                    {situacaoSelecionada === "ENCERRADO" && (
                         <div className={styles.linha5}>
-                            <label>Data de Registro</label>
-                            <input type="date" className={styles.data}/>
+                            <label>Data de Encerramento (opcional)</label>
+                            <input
+                                type="date"
+                                className={styles.data}
+                                value={form.data_encerramento}
+                                onChange={(e) => atualizarCampo("data_encerramento", e.target.value)}
+                            />
+                            <small>Se não preencher, será usada a data/hora do registro</small>
+                        </div>
+                    )}
+
+                    <div className={styles.linha3}>
+                        <input
+                            type="text"
+                            placeholder="Lote do Fornecedor"
+                            className={styles.loteF}
+                            value={form.lote}
+                            onChange={(e) => atualizarCampo("lote", e.target.value)}
+                        />
+
+                        <div className={styles.segura}>
+                            <label htmlFor="ala">Ala</label>
+                            <Dropdown
+                                as="div"
+                                label={
+                                    alaSelecionada
+                                        ? ala.find(a => a.value === alaSelecionada)?.label
+                                        : "Ala"
+                                }
+                                items={ala}
+                                selected={alaSelecionada}
+                                onSelect={setAlaSelecionada}
+                            />
+                        </div>
+
+                        <div className={styles.segura}>
+                            <label htmlFor="secao">Seção</label>
+                            <Dropdown
+                                as="div"
+                                label={
+                                    secaoSelecionada
+                                        ? secao.find(s => s.value === secaoSelecionada)?.label
+                                        : "Seção"
+                                }
+                                items={secao}
+                                selected={secaoSelecionada}
+                                onSelect={setSecaoSelecionada}
+                            />
+                        </div>
+
+                        <div className={styles.segura}>
+                            <label htmlFor="prateleira">Prateleira</label>
+                            <Dropdown
+                                as="div"
+                                label={
+                                    prateleiraSelecionada
+                                        ? prateleira.find(p => p.value === prateleiraSelecionada)?.label
+                                        : "Prateleira"
+                                }
+                                items={prateleira}
+                                selected={prateleiraSelecionada}
+                                onSelect={setPrateleiraSelecionada}
+                            />
                         </div>
                     </div>
+
                     <div className={styles.campodata}>
                         <div className={styles.linha6}>
-                            <label>Data Do Recebimento</label>
-                            <input type="date" className={styles.data}/>
+                            <label>Data de Fabricação</label>
+                            <input
+                                type="date"
+                                className={styles.data}
+                                value={form.data_fabricacao}
+                                onChange={(e) => atualizarCampo("data_fabricacao", e.target.value)}
+                            />
                         </div>
                         <div className={styles.linha6}>
-                            <label>Data Do Recebimento</label>
-                            <input type="date" className={styles.data}/>
+                            <label>Descrição (opcional)</label>
+                            <input
+                                type="text"
+                                className={styles.data}
+                                value={form.descricao}
+                                onChange={(e) => atualizarCampo("descricao", e.target.value)}
+                            />
                         </div>
                     </div>
                 </div>

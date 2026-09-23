@@ -1,10 +1,10 @@
 from django.db import models
 from app_empresas.models import Empresa
 from app_admin.models import Admin
+from django.utils import timezone
 
 
 class CatalogoProduto(models.Model):
-    """Representa um tipo de produto genérico (ex: 'Açúcar Refinado'), não um lote específico."""
     id = models.AutoField(primary_key=True)
     nome = models.CharField(max_length=150)
     empresa = models.ForeignKey(
@@ -21,9 +21,15 @@ class CatalogoProduto(models.Model):
     def __str__(self):
         return self.nome
 
+    def save(self, *args, **kwargs):
+        if self.situacao == self.Situacao.ENCERRADO and self.data_encerramento is None:
+            self.data_encerramento = timezone.now()
+        elif self.situacao != self.Situacao.ENCERRADO:
+            self.data_encerramento = None
+
+        super().save(*args, **kwargs)
 
 class Produto(models.Model):
-    """Representa um LOTE específico de um produto do catálogo."""
     class Situacao(models.TextChoices):
         ATIVO = "ATIVO", "Ativo"
         INSPECAO = "INSPECAO", "Inspeção"
@@ -59,14 +65,33 @@ class Produto(models.Model):
     situacao = models.CharField(max_length=10, choices=Situacao.choices, default=Situacao.ATIVO)
     data_fabricacao = models.DateField()
     data_cadastro = models.DateTimeField(auto_now_add=True)
+    data_encerramento = models.DateTimeField(null=True, blank=True)
     ala = models.CharField(max_length=20)
     secao = models.CharField(max_length=20)
     prateleira = models.CharField(max_length=20)
     descricao = models.CharField(max_length=300, blank=True, null=True)
 
+    def save(self, *args, **kwargs):
+        if self.situacao == self.Situacao.ENCERRADO and self.data_encerramento is None:
+            self.data_encerramento = timezone.now()
+        elif self.situacao != self.Situacao.ENCERRADO:
+            self.data_encerramento = None
+
+        super().save(*args, **kwargs)
+
     class Meta:
         db_table = "produto"
         unique_together = ("lote", "empresa")
+
+
+
+    def save(self, *args, **kwargs):
+        if self.situacao == self.Situacao.ENCERRADO and self.data_encerramento is None:
+            self.data_encerramento = timezone.now()
+        elif self.situacao != self.Situacao.ENCERRADO:
+            self.data_encerramento = None
+
+        super().save(*args, **kwargs)
 
     @property
     def nome(self):
