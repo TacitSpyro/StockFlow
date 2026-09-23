@@ -65,6 +65,7 @@ class Produto(models.Model):
     situacao = models.CharField(max_length=10, choices=Situacao.choices, default=Situacao.ATIVO)
     data_fabricacao = models.DateField()
     data_cadastro = models.DateTimeField(auto_now_add=True)
+    data_encerramento = models.DateTimeField(null=True, blank=True)
     ala = models.CharField(max_length=20)
     secao = models.CharField(max_length=20)
     prateleira = models.CharField(max_length=20)
@@ -81,6 +82,16 @@ class Produto(models.Model):
     class Meta:
         db_table = "produto"
         unique_together = ("lote", "empresa")
+
+
+
+    def save(self, *args, **kwargs):
+        if self.situacao == self.Situacao.ENCERRADO and self.data_encerramento is None:
+            self.data_encerramento = timezone.now()
+        elif self.situacao != self.Situacao.ENCERRADO:
+            self.data_encerramento = None
+
+        super().save(*args, **kwargs)
 
     @property
     def nome(self):
