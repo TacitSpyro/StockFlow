@@ -11,3 +11,31 @@
     display: flex;
     flex-direction: column;
 }
+
+.secaoProdutos {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tagsSelecionadas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag {
+  background: #eee;
+  padding: 4px 8px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.listaSugestoes {
+  list-style: none;
+  border: 1px solid #ccc;
+  max-height: 150px;
+  overflow-y: auto;
+}

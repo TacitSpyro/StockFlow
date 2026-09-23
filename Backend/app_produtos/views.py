@@ -15,6 +15,7 @@ def listar_catalogo(request, id_empresa):
     data = [{"id": c.id, "nome": c.nome} for c in catalogo]
     return Response(data)
 
+
 @api_view(['POST'])
 def criar_catalogo(request):
     nome = request.data.get("nome")
@@ -24,8 +25,7 @@ def criar_catalogo(request):
         return Response({"erro": "Nome e empresa são obrigatórios"}, status=400)
 
     catalogo, criado = CatalogoProduto.objects.get_or_create(
-        nome=nome,
+        nome=nome.strip(),
         empresa_id=id_empresa,
     )
     return Response({"id": catalogo.id, "nome": catalogo.nome, "criado": criado})
-
