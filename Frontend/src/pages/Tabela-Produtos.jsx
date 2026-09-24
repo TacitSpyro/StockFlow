@@ -20,8 +20,10 @@ function TabelaProdutos() {
                 { key: "nome", label: "Produto" },
                 { key: "lote", label: "Lote" },
                 { key: "estoque_atual", label: "Estoque Atual" },
+                { key: "estoque_capacidade", label: "Capacidade Total" },
                 { key: "situacao", label: "Situação" },
                 { key: "data_fabricacao", label: "Data Fabricação" },
+                { key: "fornecedor_nome", label: "Fornecido por" },
             ]}
             campoOrdenacao="data_fabricacao"
         />

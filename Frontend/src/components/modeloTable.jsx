@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import Dropdown from "../components/Dropdown";
 import "./modeloTable.css"
-import Logout from "../assets/Logout.png"
+import Retornar from "../assets/Retornar.png"
 import { useNavigate } from "react-router-dom";
 import { useEmpresa } from "../context/EmpresaContext";
 
@@ -56,7 +56,7 @@ function TabelaBase({
     const [carregando, setCarregando] = useState(false);
     const [erro, setErro] = useState(null);
 
-    // Busca os dados do backend (só depende do tipo e idEmpresa, não do modo de ordenação)
+    // Busca os dados do backend
     useEffect(() => {
         if (!idEmpresa || !tipo) return;
 
@@ -81,15 +81,15 @@ function TabelaBase({
 
     }, [tipo, idEmpresa]);
 
-    // Ordena localmente sempre que o modo mudar (sem precisar buscar de novo)
+    // Ordena localmente
     const linhasOrdenadas = ordenarLinhas(linhas, modo, campoOrdenacao);
 
     return (
         <>
             <div className="topbar">
                 <div className="segura">
-                    <img src={Logout} alt="desloga" className="img-Table"/>
-                    <a href="/" className="-a">Desconectar</a>
+                    <img src={Retornar} alt="retorna" className="img-Table"/>
+                    <a href="/home" className="-a">Retornar</a>
                 </div>
 
                 { edicao ? (
@@ -99,18 +99,21 @@ function TabelaBase({
                 ) : null}
             </div>
             <main className="main">
-                <label htmlFor="fo">{titulo}</label>
+                <div className="Barraemcima">
+                    <label htmlFor="fo">{titulo}</label>
 
-                <div className={"sdd"}>
-                    <Dropdown
-                        as="div"
-                        label={modo ? opcoesOrdenacao.find(o => o.value === modo).label : "Categoria"}
-                        items={opcoesOrdenacao}
-                        selected={modo}
-                        onSelect={setModo}
-                    />
+                    <div className={"sdd"}>
+                        <Dropdown
+                            as="div"
+                            label={modo ? opcoesOrdenacao.find(o => o.value === modo).label : "Categoria"}
+                            items={opcoesOrdenacao}
+                            selected={modo}
+                            onSelect={setModo}
+                        />
+                    </div>
                 </div>
 
+                
                 {carregando && <p>Carregando...</p>}
                 {erro && <p>{erro}</p>}
 
@@ -133,7 +136,7 @@ function TabelaBase({
                                     <tr key={linha.id ?? linha.id_fornecedor ?? i}>
                                         {colunas.map((col) => (
                                             <td key={col.key}>
-                                                {String(linha[col.key] ?? "")}
+                                                {col.format ? col.format(linha[col.key]) : String(linha[col.key] ?? "")}
                                             </td>
                                         ))}
                                     </tr>
