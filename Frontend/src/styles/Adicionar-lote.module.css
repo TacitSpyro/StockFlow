@@ -6,8 +6,11 @@
   align-self: center;
   border: solid 1px;
   border-color: #a7a7a7;
-  margin-right: 30%;
-  margin-left: 3%;
+  flex-direction: column;
+}
+
+p{
+    font-family: 'Montserrat';
 }
 
 .topbar{
@@ -34,10 +37,8 @@ a{
 }
 
 .loteF{
-    margin-left: 3%;
-    margin-top: 3%;
     max-height: fit-content;
-    align-self: center;
+    max-width: fit-content;
     font-size: 100%;
 }
 
@@ -58,21 +59,42 @@ a{
     margin-right: 10%;
 }
 
+input{
+    padding:0.5rem;
+    border-radius: 10px;
+    border-style: solid;
+    border-color: #000;
+    border-width: 1px;
+}
+
+.cima{
+    display: flex;
+    flex-direction: column;
+}
+
 .quant{
     margin-top: 3%;
     max-width: 30%;
 }
 
 .linha1{
+    margin-top: 3%;
     display: flex;
+    justify-content: space-between;
 }
 
 .linha2{
     display: flex;
-    flex-direction: column;
+    justify-content: space-between;
+    gap: 30px;
+}
+
+small{
+    font-family: 'Montserrat';
 }
 
 .linha3{
+    margin-top: 3%;
     display: flex;
     justify-content: space-between;
 }
@@ -89,6 +111,7 @@ a{
     display: flex;
     flex-direction: column;
     min-width: 17%;
+    margin-top: 3%;
 }
 
 .data{
