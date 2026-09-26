@@ -179,87 +179,96 @@ function AdicionarLote() {
 
                 <div className={styles.cadLot}>
                     <div className={styles.linha1}>
-                        <div className={styles.segura}>
+                        <div>
                             <label htmlFor="fornecedor">Fornecedor</label>
+                            <div className={styles.segura}>
 
-                            {carregando && <p>Carregando fornecedores...</p>}
-                            {erro && <p>{erro}</p>}
+                                {carregando && <p>Carregando fornecedores...</p>}
+                                {erro && <p>{erro}</p>}
 
-                            {!carregando && !erro && (
-                                <Dropdown
-                                    as="div"
-                                    label={
-                                        fornecedorSelecionado
-                                            ? fornecedores.find(f => f.value === fornecedorSelecionado)?.label
-                                            : "Selecione um fornecedor"
-                                    }
-                                    items={fornecedores}
-                                    selected={fornecedorSelecionado}
-                                    onSelect={setFornecedorSelecionado}
-                                />
-                            )}
+                                {!carregando && !erro && (
+                                    <Dropdown
+                                        as="div"
+                                        label={
+                                            fornecedorSelecionado
+                                                ? fornecedores.find(f => f.value === fornecedorSelecionado)?.label
+                                                : "Selecione um fornecedor"
+                                        }
+                                        items={fornecedores}
+                                        selected={fornecedorSelecionado}
+                                        onSelect={setFornecedorSelecionado}
+                                    />
+                                )}
+                            </div>
                         </div>
+                        <div>
+                            <label htmlFor="material">Produto</label>
+                            <div className={styles.segura}>
 
-                        <div className={styles.segura}>
-                            <label htmlFor="material">Material</label>
+                                {!fornecedorSelecionado && <p>Selecione um fornecedor primeiro</p>}
+                                {carregandoTipos && <p>Carregando produtos...</p>}
 
-                            {!fornecedorSelecionado && <p>Selecione um fornecedor primeiro</p>}
-                            {carregandoTipos && <p>Carregando produtos...</p>}
-
-                            {fornecedorSelecionado && !carregandoTipos && (
-                                <Dropdown
-                                    as="div"
-                                    label={
-                                        materialSelecionado
-                                            ? tipos.find(t => t.value === materialSelecionado)?.label
-                                            : "Selecione um material"
-                                    }
-                                    items={tipos}
-                                    selected={materialSelecionado}
-                                    onSelect={setMaterialSelecionado}
-                                />
-                            )}
+                                {fornecedorSelecionado && !carregandoTipos && (
+                                    <Dropdown
+                                        as="div"
+                                        label={
+                                            materialSelecionado
+                                                ? tipos.find(t => t.value === materialSelecionado)?.label
+                                                : "Selecione um material"
+                                        }
+                                        items={tipos}
+                                        selected={materialSelecionado}
+                                        onSelect={setMaterialSelecionado}
+                                    />
+                                )}
+                            </div>
                         </div>
 
                         <div className={styles.linha2}>
-                            <label>Estoque Atual</label>
-                            <input
-                                type="number"
-                                placeholder="0"
-                                className={styles.quant}
-                                value={form.estoque_atual}
-                                onChange={(e) => atualizarCampo("estoque_atual", e.target.value)}
-                            />
-                            <label>Capacidade</label>
-                            <input
-                                type="number"
-                                placeholder="100"
-                                className={styles.quant}
-                                value={form.estoque_capacidade}
-                                onChange={(e) => atualizarCampo("estoque_capacidade", e.target.value)}
-                            />
+                            <div className={styles.cima}>
+                                <label>Estoque Atual</label>
+                                <input
+                                    type="number"
+                                    placeholder="0"
+                                    className={styles.quant}
+                                    value={form.estoque_atual}
+                                    onChange={(e) => atualizarCampo("estoque_atual", e.target.value)}
+                                />
+                            </div>
+                            <div className={styles.cima}>
+                                <label>Capacidade</label>
+                                <input
+                                    type="number"
+                                    placeholder="100"
+                                    className={styles.quant}
+                                    value={form.estoque_capacidade}
+                                    onChange={(e) => atualizarCampo("estoque_capacidade", e.target.value)}
+                                />
+                            </div>
                         </div>
 
-                        <div className={styles.sdd}>
+                        <div>
                             <label htmlFor="situacao">Situação</label>
-                            <Dropdown
-                                as="div"
-                                label={
-                                    situacaoSelecionada
-                                        ? situacao.find(s => s.value === situacaoSelecionada)?.label
-                                        : "Situação"
-                                }
-                                items={situacao}
-                                selected={situacaoSelecionada}
-                                onSelect={setSituacaoSelecionada}
-                            />
+                            <div className={styles.sdd}>
+                                <Dropdown
+                                    as="div"
+                                    label={
+                                        situacaoSelecionada
+                                            ? situacao.find(s => s.value === situacaoSelecionada)?.label
+                                            : "Situação"
+                                    }
+                                    items={situacao}
+                                    selected={situacaoSelecionada}
+                                    onSelect={setSituacaoSelecionada}
+                                />
+                            </div>
                         </div>
                     </div>
 
                     
                     {situacaoSelecionada === "ENCERRADO" && (
                         <div className={styles.linha5}>
-                            <label>Data de Encerramento (opcional)</label>
+                            <label>Data de Encerramento</label>
                             <input
                                 type="date"
                                 className={styles.data}
@@ -271,57 +280,65 @@ function AdicionarLote() {
                     )}
 
                     <div className={styles.linha3}>
-                        <input
-                            type="text"
-                            placeholder="Lote do Fornecedor"
-                            className={styles.loteF}
-                            value={form.lote}
-                            onChange={(e) => atualizarCampo("lote", e.target.value)}
-                        />
-
-                        <div className={styles.segura}>
+                        <div className={styles.cima}>
+                            <label htmlFor="Lote">Lote do Fornecedor</label>
+                            <input
+                                type="text"
+                                placeholder="Ex: L 2026 A24"
+                                className={styles.loteF}
+                                value={form.lote}
+                                onChange={(e) => atualizarCampo("lote", e.target.value)}
+                            />
+                        </div>
+                        <div>
                             <label htmlFor="ala">Ala</label>
-                            <Dropdown
-                                as="div"
-                                label={
-                                    alaSelecionada
-                                        ? ala.find(a => a.value === alaSelecionada)?.label
-                                        : "Ala"
-                                }
-                                items={ala}
-                                selected={alaSelecionada}
-                                onSelect={setAlaSelecionada}
-                            />
+                            <div className={styles.segura}>
+                                <Dropdown
+                                    as="div"
+                                    label={
+                                        alaSelecionada
+                                            ? ala.find(a => a.value === alaSelecionada)?.label
+                                            : "Ala"
+                                    }
+                                    items={ala}
+                                    selected={alaSelecionada}
+                                    onSelect={setAlaSelecionada}
+                                />
+                            </div>
                         </div>
 
-                        <div className={styles.segura}>
+                        <div>
                             <label htmlFor="secao">Seção</label>
-                            <Dropdown
-                                as="div"
-                                label={
-                                    secaoSelecionada
-                                        ? secao.find(s => s.value === secaoSelecionada)?.label
-                                        : "Seção"
-                                }
-                                items={secao}
-                                selected={secaoSelecionada}
-                                onSelect={setSecaoSelecionada}
-                            />
+                            <div className={styles.segura}>
+                                <Dropdown
+                                    as="div"
+                                    label={
+                                        secaoSelecionada
+                                            ? secao.find(s => s.value === secaoSelecionada)?.label
+                                            : "Seção"
+                                    }
+                                    items={secao}
+                                    selected={secaoSelecionada}
+                                    onSelect={setSecaoSelecionada}
+                                />
+                            </div>
                         </div>
 
-                        <div className={styles.segura}>
+                        <div>
                             <label htmlFor="prateleira">Prateleira</label>
-                            <Dropdown
-                                as="div"
-                                label={
-                                    prateleiraSelecionada
-                                        ? prateleira.find(p => p.value === prateleiraSelecionada)?.label
-                                        : "Prateleira"
-                                }
-                                items={prateleira}
-                                selected={prateleiraSelecionada}
-                                onSelect={setPrateleiraSelecionada}
-                            />
+                            <div className={styles.segura}>
+                                <Dropdown
+                                    as="div"
+                                    label={
+                                        prateleiraSelecionada
+                                            ? prateleira.find(p => p.value === prateleiraSelecionada)?.label
+                                            : "Prateleira"
+                                    }
+                                    items={prateleira}
+                                    selected={prateleiraSelecionada}
+                                    onSelect={setPrateleiraSelecionada}
+                                />
+                            </div>
                         </div>
                     </div>
 

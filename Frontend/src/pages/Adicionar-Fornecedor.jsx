@@ -77,7 +77,7 @@ function CadastrarFornecedor() {
 
     // Adiciona um produto já existente do catálogo à lista de selecionados
     function selecionarProduto(item) {
-        if (produtosSelecionados.some((p) => p.id === item.id)) return; // evita duplicar
+        if (produtosSelecionados.some((p) => p.id === item.id)) return;
         setProdutosSelecionados((prev) => [...prev, item]);
         setBuscaProduto("");
     }
@@ -106,7 +106,6 @@ function CadastrarFornecedor() {
                 return;
             }
 
-            // Adiciona no catálogo local também, pra próxima busca já achar
             setCatalogo((prev) => [...prev, { id: data.id, nome: data.nome }]);
             selecionarProduto({ id: data.id, nome: data.nome });
 
@@ -162,9 +161,9 @@ function CadastrarFornecedor() {
         <>
             <main>
                 <label>Cadastrar Fornecedor</label>
-                <form onSubmit={handleSubmit}>
-                    <div className={styles.secao1}>
-                        <div className={styles.coluna1}>
+                <form onSubmit={handleSubmit}> {/*Puxa a função de confirmar */}
+                    <div className={styles.secao1}> {/*Primeira seção */}
+                        <div className={styles.coluna1}> {/*Primeira coluna */}
                             <input
                                 type="text"
                                 placeholder="Razão Social"
@@ -184,7 +183,7 @@ function CadastrarFornecedor() {
                                 onChange={(e) => atualizarCampo("cnpj_fn", e.target.value)}
                             />
                         </div>
-                        <div className={styles.coluna2}>
+                        <div className={styles.coluna2}> {/*Segunda coluna */}
                             <input
                                 type="text"
                                 placeholder="CEP"
@@ -205,8 +204,8 @@ function CadastrarFornecedor() {
                                 onChange={(e) => atualizarCampo("complemento", e.target.value)}
                             />
                         </div>
-                        <div className={styles.secao2}>
-                            <div className={styles.coluna3}>
+                        <div className={styles.secao2}> {/*Segunda seção */}
+                            <div className={styles.coluna3}> {/*Terceira coluna */}
                                 <input
                                     type="email"
                                     placeholder="Email"
@@ -225,6 +224,7 @@ function CadastrarFornecedor() {
                                     value={form.telefone_fn}
                                     onChange={(e) => atualizarCampo("telefone_fn", e.target.value)}
                                 />
+                                {/*Checkbox de atividade */}
                                 <input
                                     type="checkbox"
                                     checked={form.ativo}
@@ -237,7 +237,7 @@ function CadastrarFornecedor() {
                         </div>
                     </div>
 
-                    {/* Novo bloco: produtos fornecidos */}
+                    {/* Novo bloco: produtos fornecidos, aparece assim que o usuario escreve no campo de produtos*/}
                     <div className={styles.secaoProdutos}>
                         <label>Produtos Fornecidos</label>
 

@@ -53,10 +53,14 @@ function Login() {
   return (
     <>
       <div className={styles.pagina}>
+
+        {/*Imagem da logo*/}
         <img src={logo} alt="logo" className={styles.Logo}/>
 
+        {/*Formulário de login */}
         <form className={styles.container} id="LoginDiv" onSubmit={handleLogin}>
           <h2>Login</h2>
+          {/*Campo de inserir o código da empresa */}
           <input
             className={styles.codigo}
             type="Number"
@@ -64,6 +68,7 @@ function Login() {
             value={codigo}
             onChange={(e) => setCodigo(e.target.value)}
           />
+          {/*Campo de inserir a matricula */}
           <input
             className={styles.codigo}
             type="Number"
@@ -71,14 +76,17 @@ function Login() {
             value={usuario}
             onChange={(e) => setUsuario(e.target.value)}
           />
+          {/*Campo de inserir a senha*/}
           <input
             className={styles.codigo}
             type="password"
             placeholder="Senha Pessoal"
-            value={senha}
+            value={senha} 
             onChange={(e) => setSenha(e.target.value)}
           />
-          <button type="submit" className={styles.botao}>Entrar</button>
+          {/*Botão de confirmar o login */}
+          <button type="submit" className={styles.botao}>Entrar</button> 
+          {/*Chama a função de cofirmar e passa os valores dos inputs*/}
         </form>
       </div>
     </>
