@@ -62,7 +62,7 @@ def validar_telefone(telefone_limpo):
 
 
 def validar_cnpj_formato(cnpj_limpo):
-    """Só confere se tem 14 dígitos. Não valida dígito verificador (pode evoluir depois)."""
+    """Só confere se tem 14 dígitos. Não valida dígito verificador"""
     return len(cnpj_limpo) == 14
 
 
@@ -104,7 +104,7 @@ def criar_fornecedor(request):
     if len(cep_limpo) != 8:
         return Response({"erro": "CEP inválido. Deve conter 8 dígitos"}, status=400)
 
-    # Formata de volta pro padrão do banco (opcional, deixa mais legível)
+    # Formata de volta pro padrão do banco
     telefone_formatado = (
         f"({telefone_limpo[:2]}) {telefone_limpo[2:7]}-{telefone_limpo[7:]}"
         if len(telefone_limpo) == 11
