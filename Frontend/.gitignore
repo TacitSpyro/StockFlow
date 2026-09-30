@@ -12,6 +12,8 @@ dist
 dist-ssr
 *.local
 
+.env
+
 node_modules/
 package-lock.json
 

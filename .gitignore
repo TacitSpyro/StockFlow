@@ -10,6 +10,8 @@ db.sqlite3
 staticfiles/
 media/
 
+.env
+
 node_modules/
 package-lock.json
 
