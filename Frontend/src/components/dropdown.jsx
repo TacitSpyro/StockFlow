@@ -6,7 +6,6 @@ export default function Dropdown({ label, items, as: Tag = "li", name, defaultVa
   const [selectedInterno, setSelectedInterno] = useState(defaultValue ?? null);
   const ref = useRef(null);
 
-  // Se vier "selected" via prop (modo controlado), usa ele; senão usa o estado interno
   const selected = selectedProp !== undefined ? selectedProp : selectedInterno;
 
   useEffect(() => {
@@ -18,11 +17,11 @@ export default function Dropdown({ label, items, as: Tag = "li", name, defaultVa
   }, []);
 
   function handleSelect(item) {
-    setSelectedInterno(item.value); // continua funcionando pros casos sem onSelect
+    setSelectedInterno(item.value);
     setOpen(false);
 
     if (onSelect) {
-      onSelect(item.value); // avisa o componente pai, se ele estiver escutando
+      onSelect(item.value);
     }
   }
 
