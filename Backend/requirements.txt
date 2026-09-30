@@ -9,3 +9,6 @@ requests==2.34.2
 sqlparse==0.6.0
 tzdata==2026.4
 urllib3==2.8.0
+psycopg2-binary==2.9.13
+python-decouple==3.8
+dj-database-url==2.2.0
