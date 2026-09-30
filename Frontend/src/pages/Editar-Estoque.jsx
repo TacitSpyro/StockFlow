@@ -1,11 +1,11 @@
 import TabelaBase from "../components/modeloTable";
 
 const opcoesOrdenacao = [
-    { value: "decrescente", label: "Ordem Decrescente" },
-    { value: "crescente", label: "Ordem Crescente" },
-    { value: "recente", label: "Mais Recente" },
-    { value: "antigo", label: "Mais Antigo" }
-]
+    { value: "recente", label: "Recente" },
+    { value: "antigo", label: "Antigo" },
+    { value: "alfabetico", label: "Alfabético" },
+    { value: "estado", label: "Estado" },
+];
 
 function TabelaProdutos() {
     return (
@@ -18,7 +18,7 @@ function TabelaProdutos() {
             texto="Adicionar Lote"
             urlDoCoiso={"/cadastrar/lote"}
             colunas={[
-                { key: "nome", label: "Produto" },
+                { key: "nome", label: "Produto"},
                 { key: "lote", label: "Lote" },
                 { key: "estoque_atual", label: "Estoque Atual" },
                 { key: "estoque_capacidade", label: "Capacidade Total" },
@@ -26,7 +26,9 @@ function TabelaProdutos() {
                 { key: "data_fabricacao", label: "Data Fabricação" },
                 { key: "fornecedor_nome", label: "Fornecido por" },
             ]}
-            campoOrdenacao="data_fabricacao"
+            campoOrdenacao="data_cadastro"
+            campoNome="nome"
+            campoSituacao="situacao"
         />
     )
 }

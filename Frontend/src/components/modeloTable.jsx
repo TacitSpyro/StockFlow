@@ -10,26 +10,68 @@ const ENDPOINTS = {
     fornecedor: (idEmpresa) => `http://localhost:8000/api/empresa/${idEmpresa}/fornecedores/`,
 };
 
-function ordenarLinhas(linhas, modo, campoOrdenacao) {
+const collator = new Intl.Collator("pt-BR", { sensitivity: "base" });
+
+const normalizar = (v) => String(v ?? "").trim().toLowerCase();
+
+function ehAtivo(situacao) {
+    return situacao === true || normalizar(situacao) === "ativo";
+}
+
+function timestamp(valor) {
+    const t = new Date(valor).getTime();
+    return Number.isNaN(t) ? null : t;
+}
+
+function ordenarLinhas(linhas, modo, { campoData, campoNome, campoSituacao }) {
     const copia = [...linhas];
+    const nomeDe = (l) => String(l[campoNome] ?? l.nome ?? "");
 
     switch (modo) {
-        case "crescente":
-            return copia.sort((a, b) =>
-                String(a.nome ?? a.nome_fantasia_fn ?? "").localeCompare(String(b.nome ?? b.nome_fantasia_fn ?? ""))
-            );
-        case "decrescente":
-            return copia.sort((a, b) =>
-                String(b.nome ?? b.nome_fantasia_fn ?? "").localeCompare(String(a.nome ?? a.nome_fantasia_fn ?? ""))
-            );
         case "recente":
-            return copia.sort((a, b) => new Date(b[campoOrdenacao]) - new Date(a[campoOrdenacao]));
-        case "antigo":
-            return copia.sort((a, b) => new Date(a[campoOrdenacao]) - new Date(b[campoOrdenacao]));
+        case "antigo": {
+            const dir = modo === "recente" ? -1 : 1;
+            return copia.sort((a, b) => {
+                const ta = timestamp(a[campoData]);
+                const tb = timestamp(b[campoData]);
+                // datas inválidas/ausentes sempre vão para o final
+                if (ta === null && tb === null) return 0;
+                if (ta === null) return 1;
+                if (tb === null) return -1;
+                return (ta - tb) * dir;
+            });
+        }
+
+        case "alfabetico":
+            return copia.sort((a, b) => collator.compare(nomeDe(a), nomeDe(b)));
+
+        case "estado":
+            return copia.sort((a, b) => {
+                const aAtivo = ehAtivo(a[campoSituacao]);
+                const bAtivo = ehAtivo(b[campoSituacao]);
+
+                // ativos no topo
+                if (aAtivo !== bAtivo) return aAtivo ? -1 : 1;
+
+                // demais situações agrupadas (uma ao lado da outra)
+                if (!aAtivo) {
+                    const cmp = collator.compare(
+                        String(a[campoSituacao] ?? ""),
+                        String(b[campoSituacao] ?? "")
+                    );
+                    if (cmp !== 0) return cmp;
+                }
+
+                // dentro de cada grupo, ordem alfabética
+                return collator.compare(nomeDe(a), nomeDe(b));
+            });
+
         default:
             return copia;
     }
 }
+
+
 
 function TabelaBase({
     titulo,
@@ -41,6 +83,8 @@ function TabelaBase({
     urlDoCoiso,
     colunas,
     campoOrdenacao,
+    campoNome = "nome_fantasia_fn",
+    campoSituacao = "situacao",
 }) {
 
     const navigate = useNavigate();
@@ -81,8 +125,11 @@ function TabelaBase({
 
     }, [tipo, idEmpresa]);
 
-    // Ordena localmente
-    const linhasOrdenadas = ordenarLinhas(linhas, modo, campoOrdenacao);
+    const linhasOrdenadas = ordenarLinhas(linhas, modo, {
+        campoData: campoOrdenacao,
+        campoNome,
+        campoSituacao,
+    });
 
     return (
         <>
