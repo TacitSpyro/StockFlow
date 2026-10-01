@@ -81,6 +81,7 @@ function TabelaBase({
     edicao,
     texto,
     urlDoCoiso,
+    urlEdicaoBase,
     colunas,
     campoOrdenacao,
     campoNome = "nome_fantasia_fn",
@@ -171,23 +172,35 @@ function TabelaBase({
                                 {colunas.map((col) => (
                                     <th key={col.key}>{col.label}</th>
                                 ))}
+                                <th>Ações</th>
                             </tr>
                         </thead>
                         <tbody>
                             {linhasOrdenadas.length === 0 ? (
                                 <tr>
-                                    <td colSpan={colunas.length}>Nenhum registro encontrado</td>
+                                    <td colSpan={colunas.length + 1}>Nenhum registro encontrado</td>
                                 </tr>
                             ) : (
-                                linhasOrdenadas.map((linha, i) => (
-                                    <tr key={linha.id ?? linha.id_fornecedor ?? i}>
-                                        {colunas.map((col) => (
-                                            <td key={col.key}>
-                                                {col.format ? col.format(linha[col.key]) : String(linha[col.key] ?? "")}
+                                linhasOrdenadas.map((linha, i) => {
+                                    const id = linha.id ?? linha.id_fornecedor ?? i;
+                                    return (
+                                        <tr key={id}>
+                                            {colunas.map((col) => (
+                                                <td key={col.key}>
+                                                    {col.format ? col.format(linha[col.key]) : String(linha[col.key] ?? "")}
+                                                </td>
+                                            ))}
+                                            <td>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => navigate(`${urlEdicaoBase}/${id}`)}
+                                                >
+                                                    Editar
+                                                </button>
                                             </td>
-                                        ))}
-                                    </tr>
-                                ))
+                                        </tr>
+                                    );
+                                })
                             )}
                         </tbody>
                     </table>

@@ -17,6 +17,7 @@ function TabelaProdutos() {
             edicao={true}
             texto="Adicionar Lote"
             urlDoCoiso={"/cadastrar/lote"}
+            urlEdicaoBase="/adicionar-lote"
             colunas={[
                 { key: "nome", label: "Produto"},
                 { key: "lote", label: "Lote" },

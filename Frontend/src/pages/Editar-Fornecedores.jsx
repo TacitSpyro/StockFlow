@@ -17,6 +17,7 @@ function TabelaFornecedores() {
             edicao={true}
             texto="Adicionar Fornecedor"
             urlDoCoiso={"/cadastrar/fornecedor"}
+            urlEdicaoBase="/adicionar-fornecedor"
             colunas={[
                 { key: "nome_fantasia_fn", label: "Nome Fantasia" },
                 { key: "cnpj_fn", label: "CNPJ" },
