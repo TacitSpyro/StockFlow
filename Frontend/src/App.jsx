@@ -26,6 +26,8 @@ function App() {
           <Route path="/cadastrar/fornecedor" element={<AdicionarFornecedor />} />
           <Route path="/cadastrar/lote" element={<AdicionarLote />} />
           <Route path="/gerar-relatorio" element={<GerarRelatorio />} />
+          <Route path="/adicionar-lote/:id" element={<AdicionarLote />} />
+          <Route path="/adicionar-fornecedor/:id" element={<AdicionarFornecedor />} />
         </Routes>
       </BrowserRouter>
     </EmpresaProvider>

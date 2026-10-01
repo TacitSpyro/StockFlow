@@ -2,13 +2,15 @@ import Dropdown from "../components/Dropdown";
 import { useState, useEffect } from "react";
 import styles from "../styles/Adicionar-lote.module.css";
 import retornar from "../assets/Retornar.png"
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useEmpresa } from "../context/EmpresaContext";
 
 function AdicionarLote() {
 
     const { idEmpresa, idAdmin } = useEmpresa();
     const navigate = useNavigate();
+    const { id } = useParams(); // undefined se for cadastro novo, preenchido se for edição
+    const modoEdicao = Boolean(id);
 
     const [fornecedores, setFornecedores] = useState([]);
     const [fornecedorSelecionado, setFornecedorSelecionado] = useState(null);
@@ -33,35 +35,30 @@ function AdicionarLote() {
         descricao: "",
     });
 
+    const [carregandoProduto, setCarregandoProduto] = useState(modoEdicao);
+
     const situacao = [
         {value: "ATIVO", label:"Ativo"},
         {value: "INSPECAO", label:"Em inspeção"},
         {value: "BLOQUEIO", label:"Bloqueado"},
         {value: "ENCERRADO", label:"Encerrado"},
     ]
-
     const ala = [
         {value: "A", label:"Ala 'A'"},
         {value: "B", label:"Ala 'B'"},
         {value: "C", label:"Ala 'C'"}
     ]
-
     const secao = [
         {value: "1", label:"Seção 1"},
         {value: "2", label:"Seção 2"},
         {value: "3", label:"Seção 3"},
         {value: "4", label:"Seção 4"}
     ]
-
     const prateleira = [
-        {value: "1", label:"Primeira"},
-        {value: "2", label:"Segunda"},
-        {value: "3", label:"Terceira"},
-        {value: "4", label:"Quarta"},
-        {value: "5", label:"Quinta"},
-        {value: "6", label:"Sexta"},
-        {value: "7", label:"Sétima"},
-        {value: "8", label:"Oitava"}
+        {value: "1", label:"Primeira"}, {value: "2", label:"Segunda"},
+        {value: "3", label:"Terceira"}, {value: "4", label:"Quarta"},
+        {value: "5", label:"Quinta"}, {value: "6", label:"Sexta"},
+        {value: "7", label:"Sétima"}, {value: "8", label:"Oitava"}
     ]
 
     function atualizarCampo(campo, valor) {
@@ -70,57 +67,65 @@ function AdicionarLote() {
 
     useEffect(() => {
         if (!idEmpresa) return;
-
         setCarregando(true);
         setErro(null);
 
         fetch(`http://localhost:8000/api/empresa/${idEmpresa}/fornecedores/`)
+            .then((res) => { if (!res.ok) throw new Error(); return res.json(); })
+            .then((data) => {
+                setFornecedores(data.map((f) => ({ value: f.id_fornecedor, label: f.razao_social_fn })));
+            })
+            .catch(() => { setErro("Não foi possível carregar os fornecedores"); setFornecedores([]); })
+            .finally(() => setCarregando(false));
+    }, [idEmpresa]);
+
+    //se estiver em modo edição, busca os dados do produto e preenche tudo
+    useEffect(() => {
+        if (!modoEdicao) return;
+
+        fetch(`http://localhost:8000/api/produto/${id}/`)
             .then((res) => {
-                if (!res.ok) throw new Error("Erro ao buscar fornecedores");
+                if (!res.ok) throw new Error("Produto não encontrado");
                 return res.json();
             })
             .then((data) => {
-                const opcoes = data.map((f) => ({
-                    value: f.id_fornecedor,
-                    label: f.razao_social_fn,
-                }));
-                setFornecedores(opcoes);
+                setFornecedorSelecionado(data.fornecedor);
+                setMaterialSelecionado(data.catalogo);
+                setSituacaoSelecionada(data.situacao);
+                setAlaSelecionada(data.ala);
+                setSecaoSelecionada(data.secao);
+                setPrateleiraSelecionada(data.prateleira);
+                setForm({
+                    lote: data.lote || "",
+                    estoque_atual: data.estoque_atual ?? "",
+                    estoque_capacidade: data.estoque_capacidade ?? "",
+                    data_fabricacao: data.data_fabricacao || "",
+                    data_encerramento: data.data_encerramento ? data.data_encerramento.slice(0, 10) : "",
+                    descricao: data.descricao || "",
+                });
             })
             .catch((err) => {
                 console.error(err);
-                setErro("Não foi possível carregar os fornecedores");
-                setFornecedores([]);
+                alert("Erro ao carregar dados do lote");
             })
-            .finally(() => setCarregando(false));
+            .finally(() => setCarregandoProduto(false));
 
-    }, [idEmpresa]);
+    }, [id, modoEdicao]);
 
     useEffect(() => {
         if (!fornecedorSelecionado) {
             setTipos([]);
-            setMaterialSelecionado(null);
             return;
         }
 
         setCarregandoTipos(true);
-        setMaterialSelecionado(null);
 
         fetch(`http://localhost:8000/api/fornecedor/${fornecedorSelecionado}/catalogo/`)
-            .then((res) => {
-                if (!res.ok) throw new Error("Erro ao buscar catálogo do fornecedor");
-                return res.json();
-            })
+            .then((res) => { if (!res.ok) throw new Error(); return res.json(); })
             .then((data) => {
-                const opcoes = data.map((p) => ({
-                    value: p.id,
-                    label: p.nome,
-                }));
-                setTipos(opcoes);
+                setTipos(data.map((p) => ({ value: p.id, label: p.nome })));
             })
-            .catch((err) => {
-                console.error(err);
-                setTipos([]);
-            })
+            .catch(() => setTipos([]))
             .finally(() => setCarregandoTipos(false));
 
     }, [fornecedorSelecionado]);
@@ -133,37 +138,48 @@ function AdicionarLote() {
             return;
         }
 
+        const corpo = {
+            ...form,
+            catalogo: materialSelecionado,
+            fornecedor: fornecedorSelecionado,
+            situacao: situacaoSelecionada,
+            ala: alaSelecionada,
+            secao: secaoSelecionada,
+            prateleira: prateleiraSelecionada,
+            id_empresa: idEmpresa,
+            id_admin: idAdmin,
+        };
+
+        const url = modoEdicao
+            ? `http://localhost:8000/api/produto/${id}/atualizar/`
+            : "http://localhost:8000/api/produto/criar/";
+        const metodo = modoEdicao ? "PUT" : "POST";
+
         try {
-            const response = await fetch("http://localhost:8000/api/produto/criar/", {
-                method: "POST",
+            const response = await fetch(url, {
+                method: metodo,
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    ...form,
-                    catalogo: materialSelecionado,
-                    fornecedor: fornecedorSelecionado,
-                    situacao: situacaoSelecionada,
-                    ala: alaSelecionada,
-                    secao: secaoSelecionada,
-                    prateleira: prateleiraSelecionada,
-                    id_empresa: idEmpresa,
-                    id_admin: idAdmin,
-                }),
+                body: JSON.stringify(corpo),
             });
 
             const data = await response.json();
 
             if (!response.ok) {
-                alert(data.erro || "Erro ao registrar lote");
+                alert(data.erro || "Erro ao salvar lote");
                 return;
             }
 
-            alert("Lote registrado com sucesso!");
+            alert(modoEdicao ? "Lote atualizado com sucesso!" : "Lote registrado com sucesso!");
             navigate("/edição/produtos");
 
         } catch (error) {
             console.error(error);
             alert("Erro ao conectar com o servidor");
         }
+    }
+
+    if (carregandoProduto) {
+        return <p>Carregando dados do lote...</p>;
     }
 
     return (
@@ -174,8 +190,8 @@ function AdicionarLote() {
             </div>
 
             <form onSubmit={registrarLote} className={styles.container}>
+                <label>{modoEdicao ? "Editar Lote" : "Cadastrar Lote"}</label>
 
-                <label>Cadastrar Lote</label>
 
                 <div className={styles.cadLot}>
                     <div className={styles.linha1}>
@@ -363,7 +379,10 @@ function AdicionarLote() {
                         </div>
                     </div>
                 </div>
-                <button type="submit" id="add" className={styles.add}>Confirmar Registro</button>
+
+                <button type="submit" id="add" className={styles.add}>
+                    {modoEdicao ? "Salvar Alterações" : "Confirmar Registro"}
+                </button>
             </form>
         </>
     )

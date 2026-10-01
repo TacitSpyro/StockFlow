@@ -145,3 +145,69 @@ def criar_fornecedor(request):
         "id_fornecedor": fornecedor.id_fornecedor,
         "nome_fantasia_fn": fornecedor.nome_fantasia_fn,
     }, status=201)
+
+@api_view(['GET'])
+def obter_fornecedor(request, id_fornecedor):
+    try:
+        fornecedor = Fornecedor.objects.get(id_fornecedor=id_fornecedor)
+    except Fornecedor.DoesNotExist:
+        return Response({"erro": "Fornecedor não encontrado"}, status=404)
+
+    produtos_ids = list(fornecedor.produtos.values_list('id', flat=True))
+    produtos_info = [{"id": p.id, "nome": p.nome} for p in fornecedor.produtos.all()]
+
+    return Response({
+        "id_fornecedor": fornecedor.id_fornecedor,
+        "razao_social_fn": fornecedor.razao_social_fn,
+        "nome_fantasia_fn": fornecedor.nome_fantasia_fn,
+        "cnpj_fn": fornecedor.cnpj_fn,
+        "cep": fornecedor.cep,
+        "logradouro": fornecedor.logradouro,
+        "bairro": fornecedor.bairro,
+        "cidade": fornecedor.cidade,
+        "uf": fornecedor.uf,
+        "numero": fornecedor.numero,
+        "complemento": fornecedor.complemento,
+        "email_fn": fornecedor.email_fn,
+        "nome_responsavel": fornecedor.nome_responsavel,
+        "telefone_fn": fornecedor.telefone_fn,
+        "ativo": fornecedor.ativo,
+        "produtos_ids": produtos_ids,
+        "produtos_info": produtos_info,
+    })
+
+
+@api_view(['PUT'])
+def atualizar_fornecedor(request, id_fornecedor):
+    try:
+        fornecedor = Fornecedor.objects.get(id_fornecedor=id_fornecedor)
+    except Fornecedor.DoesNotExist:
+        return Response({"erro": "Fornecedor não encontrado"}, status=404)
+
+    dados = request.data
+
+    telefone_limpo = limpar_numeros(dados.get("telefone_fn", fornecedor.telefone_fn))
+    if telefone_limpo and not validar_telefone(telefone_limpo):
+        return Response({"erro": "Telefone inválido"}, status=400)
+
+    fornecedor.razao_social_fn = dados.get("razao_social_fn", fornecedor.razao_social_fn)
+    fornecedor.nome_fantasia_fn = dados.get("nome_fantasia_fn", fornecedor.nome_fantasia_fn)
+    fornecedor.cnpj_fn = dados.get("cnpj_fn", fornecedor.cnpj_fn)
+    fornecedor.cep = dados.get("cep", fornecedor.cep)
+    fornecedor.logradouro = dados.get("logradouro", fornecedor.logradouro)
+    fornecedor.bairro = dados.get("bairro", fornecedor.bairro)
+    fornecedor.cidade = dados.get("cidade", fornecedor.cidade)
+    fornecedor.uf = dados.get("uf", fornecedor.uf)
+    fornecedor.numero = dados.get("numero", fornecedor.numero)
+    fornecedor.complemento = dados.get("complemento", fornecedor.complemento)
+    fornecedor.email_fn = dados.get("email_fn", fornecedor.email_fn)
+    fornecedor.nome_responsavel = dados.get("nome_responsavel", fornecedor.nome_responsavel)
+    fornecedor.telefone_fn = dados.get("telefone_fn", fornecedor.telefone_fn)
+    fornecedor.ativo = dados.get("ativo", fornecedor.ativo)
+    fornecedor.save()
+
+    produtos_ids = dados.get("produtos_ids")
+    if produtos_ids is not None:
+        fornecedor.produtos.set(produtos_ids)
+
+    return Response({"id_fornecedor": fornecedor.id_fornecedor})

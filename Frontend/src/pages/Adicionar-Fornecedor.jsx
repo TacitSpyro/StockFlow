@@ -1,10 +1,14 @@
 import { useState, useEffect } from "react";
 import styles from "../styles/Adicionar-fornecedor.module.css"
+import { useNavigate, useParams } from "react-router-dom";
 import { useEmpresa } from "../context/EmpresaContext";
 
 function CadastrarFornecedor() {
 
     const { idEmpresa, idAdmin } = useEmpresa();
+    const navigate = useNavigate();
+    const { id } = useParams();
+    const modoEdicao = Boolean(id);
 
     const [form, setForm] = useState({
         razao_social_fn: "",
@@ -23,16 +27,17 @@ function CadastrarFornecedor() {
         ativo: true,
     });
 
-    // Catálogo de produtos
-    const [catalogo, setCatalogo] = useState([]); // tudo que já existe na empresa
-    const [produtosSelecionados, setProdutosSelecionados] = useState([]); // itens escolhidos {id, nome}
-    const [buscaProduto, setBuscaProduto] = useState(""); // texto digitado na busca/criação
+    const [catalogo, setCatalogo] = useState([]);
+    const [produtosSelecionados, setProdutosSelecionados] = useState([]);
+    const [buscaProduto, setBuscaProduto] = useState("");
+
+    const [carregandoFornecedor, setCarregandoFornecedor] = useState(modoEdicao);
 
     function atualizarCampo(campo, valor) {
         setForm((prev) => ({ ...prev, [campo]: valor }));
     }
 
-    // Busca o catálogo já existente assim que a página carrega
+    // Busca o catálogo geral da empresa (igual já era)
     useEffect(() => {
         if (!idEmpresa) return;
 
@@ -42,6 +47,42 @@ function CadastrarFornecedor() {
             .catch((err) => console.error(err));
 
     }, [idEmpresa]);
+
+    // NOVO: se estiver em modo edição, busca os dados do fornecedor e preenche o form
+    useEffect(() => {
+        if (!modoEdicao) return;
+
+        fetch(`http://localhost:8000/api/fornecedor/${id}/`)
+            .then((res) => {
+                if (!res.ok) throw new Error("Fornecedor não encontrado");
+                return res.json();
+            })
+            .then((data) => {
+                setForm({
+                    razao_social_fn: data.razao_social_fn || "",
+                    nome_fantasia_fn: data.nome_fantasia_fn || "",
+                    cnpj_fn: data.cnpj_fn || "",
+                    cep: data.cep || "",
+                    logradouro: data.logradouro || "",
+                    bairro: data.bairro || "",
+                    cidade: data.cidade || "",
+                    uf: data.uf || "",
+                    numero: data.numero || "",
+                    complemento: data.complemento || "",
+                    email_fn: data.email_fn || "",
+                    nome_responsavel: data.nome_responsavel || "",
+                    telefone_fn: data.telefone_fn || "",
+                    ativo: data.ativo,
+                });
+                setProdutosSelecionados(data.produtos_info || []);
+            })
+            .catch((err) => {
+                console.error(err);
+                alert("Erro ao carregar dados do fornecedor");
+            })
+            .finally(() => setCarregandoFornecedor(false));
+
+    }, [id, modoEdicao]);
 
     async function calcularCep(e) {
         e.preventDefault();
@@ -75,19 +116,16 @@ function CadastrarFornecedor() {
         }
     }
 
-    // Adiciona um produto já existente do catálogo à lista de selecionados
     function selecionarProduto(item) {
         if (produtosSelecionados.some((p) => p.id === item.id)) return;
         setProdutosSelecionados((prev) => [...prev, item]);
         setBuscaProduto("");
     }
 
-    // Remove um produto da lista de selecionados
     function removerProduto(id) {
         setProdutosSelecionados((prev) => prev.filter((p) => p.id !== id));
     }
 
-    // Cria um produto novo no catálogo (quando não existe ainda) e já seleciona
     async function criarNovoProduto() {
         const nome = buscaProduto.trim();
         if (!nome) return;
@@ -115,14 +153,12 @@ function CadastrarFornecedor() {
         }
     }
 
-    // Filtra o catálogo com base no texto digitado, excluindo os já selecionados
     const sugestoes = catalogo.filter(
         (item) =>
             item.nome.toLowerCase().includes(buscaProduto.toLowerCase()) &&
             !produtosSelecionados.some((p) => p.id === item.id)
     );
 
-    // Confere se o texto digitado já bate exatamente com algo existente
     const existeExato = catalogo.some(
         (item) => item.nome.toLowerCase() === buscaProduto.trim().toLowerCase()
     );
@@ -130,26 +166,34 @@ function CadastrarFornecedor() {
     async function handleSubmit(e) {
         e.preventDefault();
 
+        const corpo = {
+            ...form,
+            id_empresa: idEmpresa,
+            id_admin: idAdmin,
+            produtos_ids: produtosSelecionados.map((p) => p.id),
+        };
+
+        const url = modoEdicao
+            ? `http://localhost:8000/api/fornecedor/${id}/atualizar/`
+            : "http://localhost:8000/api/fornecedor/criar/";
+        const metodo = modoEdicao ? "PUT" : "POST";
+
         try {
-            const response = await fetch("http://localhost:8000/api/fornecedor/criar/", {
-                method: "POST",
+            const response = await fetch(url, {
+                method: metodo,
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    ...form,
-                    id_empresa: idEmpresa,
-                    id_admin: idAdmin,
-                    produtos_ids: produtosSelecionados.map((p) => p.id),
-                }),
+                body: JSON.stringify(corpo),
             });
 
             const data = await response.json();
 
             if (!response.ok) {
-                alert(data.erro || "Erro ao cadastrar fornecedor");
+                alert(data.erro || "Erro ao salvar fornecedor");
                 return;
             }
 
-            alert("Fornecedor cadastrado com sucesso!");
+            alert(modoEdicao ? "Fornecedor atualizado com sucesso!" : "Fornecedor cadastrado com sucesso!");
+            navigate("/edição/fornecedores");
 
         } catch (error) {
             console.error(error);
@@ -157,13 +201,17 @@ function CadastrarFornecedor() {
         }
     }
 
+    if (carregandoFornecedor) {
+        return <p>Carregando dados do fornecedor...</p>;
+    }
+
     return (
         <>
             <main>
-                <label>Cadastrar Fornecedor</label>
-                <form onSubmit={handleSubmit}> {/*Puxa a função de confirmar */}
-                    <div className={styles.secao1}> {/*Primeira seção */}
-                        <div className={styles.coluna1}> {/*Primeira coluna */}
+                <label>{modoEdicao ? "Editar Fornecedor" : "Cadastrar Fornecedor"}</label>
+                <form onSubmit={handleSubmit}>
+                    <div className={styles.secao1}>
+                        <div className={styles.coluna1}>
                             <input
                                 type="text"
                                 placeholder="Razão Social"
@@ -183,7 +231,7 @@ function CadastrarFornecedor() {
                                 onChange={(e) => atualizarCampo("cnpj_fn", e.target.value)}
                             />
                         </div>
-                        <div className={styles.coluna2}> {/*Segunda coluna */}
+                        <div className={styles.coluna2}>
                             <input
                                 type="text"
                                 placeholder="CEP"
@@ -204,8 +252,8 @@ function CadastrarFornecedor() {
                                 onChange={(e) => atualizarCampo("complemento", e.target.value)}
                             />
                         </div>
-                        <div className={styles.secao2}> {/*Segunda seção */}
-                            <div className={styles.coluna3}> {/*Terceira coluna */}
+                        <div className={styles.secao2}>
+                            <div className={styles.coluna3}>
                                 <input
                                     type="email"
                                     placeholder="Email"
@@ -224,7 +272,7 @@ function CadastrarFornecedor() {
                                     value={form.telefone_fn}
                                     onChange={(e) => atualizarCampo("telefone_fn", e.target.value)}
                                 />
-                                {/*Checkbox de atividade */}
+
                                 <input
                                     type="checkbox"
                                     checked={form.ativo}
@@ -237,7 +285,6 @@ function CadastrarFornecedor() {
                         </div>
                     </div>
 
-                    {/* Novo bloco: produtos fornecidos, aparece assim que o usuario escreve no campo de produtos*/}
                     <div className={styles.secaoProdutos}>
                         <label>Produtos Fornecidos</label>
 
@@ -278,7 +325,7 @@ function CadastrarFornecedor() {
                         )}
                     </div>
 
-                    <button type="submit">Cadastrar</button>
+                    <button type="submit">{modoEdicao ? "Salvar Alterações" : "Cadastrar"}</button>
                 </form>
             </main>
         </>

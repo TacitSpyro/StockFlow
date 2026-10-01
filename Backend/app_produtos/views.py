@@ -82,3 +82,57 @@ def criar_produto(request):
         "situacao": produto.situacao,
         "data_encerramento": produto.data_encerramento,
     }, status=201)
+
+
+@api_view(['GET'])
+def obter_produto(request, id_produto):
+    try:
+        produto = Produto.objects.select_related('catalogo', 'fornecedor').get(id=id_produto)
+    except Produto.DoesNotExist:
+        return Response({"erro": "Produto não encontrado"}, status=404)
+
+    return Response({
+        "id": produto.id,
+        "catalogo": produto.catalogo_id,
+        "fornecedor": produto.fornecedor_id,
+        "lote": produto.lote,
+        "estoque_atual": produto.estoque_atual,
+        "estoque_capacidade": produto.estoque_capacidade,
+        "situacao": produto.situacao,
+        "data_fabricacao": produto.data_fabricacao,
+        "data_encerramento": produto.data_encerramento,
+        "ala": produto.ala,
+        "secao": produto.secao,
+        "prateleira": produto.prateleira,
+        "descricao": produto.descricao,
+    })
+
+
+@api_view(['PUT'])
+def atualizar_produto(request, id_produto):
+    try:
+        produto = Produto.objects.get(id=id_produto)
+    except Produto.DoesNotExist:
+        return Response({"erro": "Produto não encontrado"}, status=404)
+
+    dados = request.data
+
+    produto.catalogo_id = dados.get("catalogo", produto.catalogo_id)
+    produto.fornecedor_id = dados.get("fornecedor", produto.fornecedor_id)
+    produto.lote = dados.get("lote", produto.lote)
+    produto.estoque_atual = dados.get("estoque_atual", produto.estoque_atual)
+    produto.estoque_capacidade = dados.get("estoque_capacidade", produto.estoque_capacidade)
+    produto.situacao = dados.get("situacao", produto.situacao)
+    produto.data_fabricacao = dados.get("data_fabricacao", produto.data_fabricacao)
+    produto.ala = dados.get("ala", produto.ala)
+    produto.secao = dados.get("secao", produto.secao)
+    produto.prateleira = dados.get("prateleira", produto.prateleira)
+    produto.descricao = dados.get("descricao", produto.descricao)
+
+    data_encerramento = dados.get("data_encerramento")
+    if data_encerramento:
+        produto.data_encerramento = data_encerramento
+
+    produto.save()
+
+    return Response({"id": produto.id, "lote": produto.lote})
