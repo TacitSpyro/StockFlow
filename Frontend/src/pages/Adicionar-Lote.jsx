@@ -2,15 +2,19 @@ import Dropdown from "../components/Dropdown";
 import { useState, useEffect } from "react";
 import styles from "../styles/Adicionar-lote.module.css";
 import retornar from "../assets/Retornar.png"
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useEmpresa } from "../context/EmpresaContext";
 
 function AdicionarLote() {
 
     const { idEmpresa, idAdmin } = useEmpresa();
     const navigate = useNavigate();
-    const { id } = useParams(); // undefined se for cadastro novo, preenchido se for edição
-    const modoEdicao = Boolean(id);
+    const { id } = useParams();
+    const location = useLocation();
+
+    const modoEdicao = Boolean(id) && location.pathname.startsWith("/adicionar-lote");
+    const somenteLeitura = Boolean(id) && location.pathname.startsWith("/visualizar-lote");
+    const precisaCarregarDados = modoEdicao || somenteLeitura;
 
     const [fornecedores, setFornecedores] = useState([]);
     const [fornecedorSelecionado, setFornecedorSelecionado] = useState(null);
@@ -35,7 +39,7 @@ function AdicionarLote() {
         descricao: "",
     });
 
-    const [carregandoProduto, setCarregandoProduto] = useState(modoEdicao);
+    const [carregandoProduto, setCarregandoProduto] = useState(precisaCarregarDados);
 
     const situacao = [
         {value: "ATIVO", label:"Ativo"},
@@ -44,15 +48,11 @@ function AdicionarLote() {
         {value: "ENCERRADO", label:"Encerrado"},
     ]
     const ala = [
-        {value: "A", label:"Ala 'A'"},
-        {value: "B", label:"Ala 'B'"},
-        {value: "C", label:"Ala 'C'"}
+        {value: "A", label:"Ala 'A'"}, {value: "B", label:"Ala 'B'"}, {value: "C", label:"Ala 'C'"}
     ]
     const secao = [
-        {value: "1", label:"Seção 1"},
-        {value: "2", label:"Seção 2"},
-        {value: "3", label:"Seção 3"},
-        {value: "4", label:"Seção 4"}
+        {value: "1", label:"Seção 1"}, {value: "2", label:"Seção 2"},
+        {value: "3", label:"Seção 3"}, {value: "4", label:"Seção 4"}
     ]
     const prateleira = [
         {value: "1", label:"Primeira"}, {value: "2", label:"Segunda"},
@@ -62,7 +62,15 @@ function AdicionarLote() {
     ]
 
     function atualizarCampo(campo, valor) {
+        if (somenteLeitura) return; // trava edição
         setForm((prev) => ({ ...prev, [campo]: valor }));
+    }
+
+    function selecionarComTravar(setter) {
+        return (valor) => {
+            if (somenteLeitura) return;
+            setter(valor);
+        };
     }
 
     useEffect(() => {
@@ -79,9 +87,9 @@ function AdicionarLote() {
             .finally(() => setCarregando(false));
     }, [idEmpresa]);
 
-    //se estiver em modo edição, busca os dados do produto e preenche tudo
+    // Busca os dados do lote, tanto pra edição quanto pra visualização
     useEffect(() => {
-        if (!modoEdicao) return;
+        if (!precisaCarregarDados) return;
 
         fetch(`http://localhost:8000/api/produto/${id}/`)
             .then((res) => {
@@ -110,7 +118,7 @@ function AdicionarLote() {
             })
             .finally(() => setCarregandoProduto(false));
 
-    }, [id, modoEdicao]);
+    }, [id, precisaCarregarDados]);
 
     useEffect(() => {
         if (!fornecedorSelecionado) {
@@ -122,9 +130,7 @@ function AdicionarLote() {
 
         fetch(`http://localhost:8000/api/fornecedor/${fornecedorSelecionado}/catalogo/`)
             .then((res) => { if (!res.ok) throw new Error(); return res.json(); })
-            .then((data) => {
-                setTipos(data.map((p) => ({ value: p.id, label: p.nome })));
-            })
+            .then((data) => setTipos(data.map((p) => ({ value: p.id, label: p.nome }))))
             .catch(() => setTipos([]))
             .finally(() => setCarregandoTipos(false));
 
@@ -132,6 +138,7 @@ function AdicionarLote() {
 
     async function registrarLote(e) {
         e.preventDefault();
+        if (somenteLeitura) return;
 
         if (!fornecedorSelecionado || !materialSelecionado || !situacaoSelecionada) {
             alert("Preencha fornecedor, material e situação");
@@ -182,26 +189,25 @@ function AdicionarLote() {
         return <p>Carregando dados do lote...</p>;
     }
 
+    const tituloTela = somenteLeitura ? "Visualizar Lote" : modoEdicao ? "Editar Lote" : "Cadastrar Lote";
+
     return (
         <>
             <div className={styles.topbar}>
                 <img src={retornar} alt="retornar" className="navbar-img"/>
-                <a href="/edição/produtos">Cancelar</a>
+                <a href="/edição/produtos">{somenteLeitura ? "Voltar" : "Cancelar"}</a>
             </div>
 
             <form onSubmit={registrarLote} className={styles.container}>
-                <label>{modoEdicao ? "Editar Lote" : "Cadastrar Lote"}</label>
-
+                <label>{tituloTela}</label>
 
                 <div className={styles.cadLot}>
                     <div className={styles.linha1}>
                         <div>
                             <label htmlFor="fornecedor">Fornecedor</label>
                             <div className={styles.segura}>
-
                                 {carregando && <p>Carregando fornecedores...</p>}
                                 {erro && <p>{erro}</p>}
-
                                 {!carregando && !erro && (
                                     <Dropdown
                                         as="div"
@@ -212,18 +218,18 @@ function AdicionarLote() {
                                         }
                                         items={fornecedores}
                                         selected={fornecedorSelecionado}
-                                        onSelect={setFornecedorSelecionado}
+                                        onSelect={selecionarComTravar(setFornecedorSelecionado)}
+                                        disabled={somenteLeitura}
                                     />
                                 )}
                             </div>
                         </div>
+
                         <div>
                             <label htmlFor="material">Produto</label>
                             <div className={styles.segura}>
-
                                 {!fornecedorSelecionado && <p>Selecione um fornecedor primeiro</p>}
                                 {carregandoTipos && <p>Carregando produtos...</p>}
-
                                 {fornecedorSelecionado && !carregandoTipos && (
                                     <Dropdown
                                         as="div"
@@ -234,7 +240,8 @@ function AdicionarLote() {
                                         }
                                         items={tipos}
                                         selected={materialSelecionado}
-                                        onSelect={setMaterialSelecionado}
+                                        onSelect={selecionarComTravar(setMaterialSelecionado)}
+                                        disabled={somenteLeitura}
                                     />
                                 )}
                             </div>
@@ -249,6 +256,7 @@ function AdicionarLote() {
                                     className={styles.quant}
                                     value={form.estoque_atual}
                                     onChange={(e) => atualizarCampo("estoque_atual", e.target.value)}
+                                    disabled={somenteLeitura}
                                 />
                             </div>
                             <div className={styles.cima}>
@@ -259,6 +267,7 @@ function AdicionarLote() {
                                     className={styles.quant}
                                     value={form.estoque_capacidade}
                                     onChange={(e) => atualizarCampo("estoque_capacidade", e.target.value)}
+                                    disabled={somenteLeitura}
                                 />
                             </div>
                         </div>
@@ -275,13 +284,13 @@ function AdicionarLote() {
                                     }
                                     items={situacao}
                                     selected={situacaoSelecionada}
-                                    onSelect={setSituacaoSelecionada}
+                                    onSelect={selecionarComTravar(setSituacaoSelecionada)}
+                                    disabled={somenteLeitura}
                                 />
                             </div>
                         </div>
                     </div>
 
-                    
                     {situacaoSelecionada === "ENCERRADO" && (
                         <div className={styles.linha5}>
                             <label>Data de Encerramento</label>
@@ -290,8 +299,9 @@ function AdicionarLote() {
                                 className={styles.data}
                                 value={form.data_encerramento}
                                 onChange={(e) => atualizarCampo("data_encerramento", e.target.value)}
+                                disabled={somenteLeitura}
                             />
-                            <small>Se não preencher, será usada a data/hora do registro</small>
+                            {!somenteLeitura && <small>Se não preencher, será usada a data/hora do registro</small>}
                         </div>
                     )}
 
@@ -304,6 +314,7 @@ function AdicionarLote() {
                                 className={styles.loteF}
                                 value={form.lote}
                                 onChange={(e) => atualizarCampo("lote", e.target.value)}
+                                disabled={somenteLeitura}
                             />
                         </div>
                         <div>
@@ -311,48 +322,37 @@ function AdicionarLote() {
                             <div className={styles.segura}>
                                 <Dropdown
                                     as="div"
-                                    label={
-                                        alaSelecionada
-                                            ? ala.find(a => a.value === alaSelecionada)?.label
-                                            : "Ala"
-                                    }
+                                    label={alaSelecionada ? ala.find(a => a.value === alaSelecionada)?.label : "Ala"}
                                     items={ala}
                                     selected={alaSelecionada}
-                                    onSelect={setAlaSelecionada}
+                                    onSelect={selecionarComTravar(setAlaSelecionada)}
+                                    disabled={somenteLeitura}
                                 />
                             </div>
                         </div>
-
                         <div>
                             <label htmlFor="secao">Seção</label>
                             <div className={styles.segura}>
                                 <Dropdown
                                     as="div"
-                                    label={
-                                        secaoSelecionada
-                                            ? secao.find(s => s.value === secaoSelecionada)?.label
-                                            : "Seção"
-                                    }
+                                    label={secaoSelecionada ? secao.find(s => s.value === secaoSelecionada)?.label : "Seção"}
                                     items={secao}
                                     selected={secaoSelecionada}
-                                    onSelect={setSecaoSelecionada}
+                                    onSelect={selecionarComTravar(setSecaoSelecionada)}
+                                    disabled={somenteLeitura}
                                 />
                             </div>
                         </div>
-
                         <div>
                             <label htmlFor="prateleira">Prateleira</label>
                             <div className={styles.segura}>
                                 <Dropdown
                                     as="div"
-                                    label={
-                                        prateleiraSelecionada
-                                            ? prateleira.find(p => p.value === prateleiraSelecionada)?.label
-                                            : "Prateleira"
-                                    }
+                                    label={prateleiraSelecionada ? prateleira.find(p => p.value === prateleiraSelecionada)?.label : "Prateleira"}
                                     items={prateleira}
                                     selected={prateleiraSelecionada}
-                                    onSelect={setPrateleiraSelecionada}
+                                    onSelect={selecionarComTravar(setPrateleiraSelecionada)}
+                                    disabled={somenteLeitura}
                                 />
                             </div>
                         </div>
@@ -366,6 +366,7 @@ function AdicionarLote() {
                                 className={styles.data}
                                 value={form.data_fabricacao}
                                 onChange={(e) => atualizarCampo("data_fabricacao", e.target.value)}
+                                disabled={somenteLeitura}
                             />
                         </div>
                         <div className={styles.linha6}>
@@ -375,14 +376,17 @@ function AdicionarLote() {
                                 className={styles.data}
                                 value={form.descricao}
                                 onChange={(e) => atualizarCampo("descricao", e.target.value)}
+                                disabled={somenteLeitura}
                             />
                         </div>
                     </div>
                 </div>
 
-                <button type="submit" id="add" className={styles.add}>
-                    {modoEdicao ? "Salvar Alterações" : "Confirmar Registro"}
-                </button>
+                {!somenteLeitura && (
+                    <button type="submit" id="add" className={styles.add}>
+                        {modoEdicao ? "Salvar Alterações" : "Confirmar Registro"}
+                    </button>
+                )}
             </form>
         </>
     )
