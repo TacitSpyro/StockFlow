@@ -225,6 +225,7 @@ function CadastrarFornecedor() {
                     <div className={styles.secao1}>
                         <div className={styles.coluna1}>
                             <input
+                                className={styles.razao}
                                 type="text"
                                 placeholder="Razão Social"
                                 value={form.razao_social_fn}
@@ -232,6 +233,7 @@ function CadastrarFornecedor() {
                                 disabled={somenteLeitura}
                             />
                             <input
+                            className={styles.nomeF}
                                 type="text"
                                 placeholder="Nome Fantasia"
                                 value={form.nome_fantasia_fn}
