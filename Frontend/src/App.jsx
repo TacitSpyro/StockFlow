@@ -10,6 +10,7 @@ import AdicionarFornecedor from "./pages/Adicionar-Fornecedor"
 import AdicionarLote from "./pages/Adicionar-Lote"
 import EdicaoProdutos from "./pages/Editar-Estoque"
 import GerarRelatorio from "./pages/Gerar-Relatorio"
+import VisualizarRelatorio from "./pages/visualizar_relatorio";
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
           <Route path="/adicionar-lote" element={<AdicionarLote />} />
           <Route path="/visualizar-lote/:id" element={<AdicionarLote />} />
           <Route path="/visualizar-fornecedor/:id" element={<AdicionarFornecedor />} />
+          <Route path="/visualizar-relatorio/:id" element={<VisualizarRelatorio />} />
         </Routes>
       </BrowserRouter>
     </EmpresaProvider>
