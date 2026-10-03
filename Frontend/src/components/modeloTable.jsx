@@ -8,6 +8,7 @@ import { useEmpresa } from "../context/EmpresaContext";
 const ENDPOINTS = {
     produto: (idEmpresa) => `http://localhost:8000/api/empresa/${idEmpresa}/produtos/`,
     fornecedor: (idEmpresa) => `http://localhost:8000/api/empresa/${idEmpresa}/fornecedores/`,
+    relatorio: (idEmpresa) => `http://localhost:8000/api/empresa/${idEmpresa}/relatorios/`,
 };
 
 const collator = new Intl.Collator("pt-BR", { sensitivity: "base" });
@@ -78,9 +79,9 @@ function TabelaBase({
     tipo,
     opcoesOrdenacao,
     modoInicial,
-    edicao,
+    edicao,              
     texto,
-    urlDoCoiso,
+    urlDoCoiso,            
     urlEdicaoBase,
     urlVisualizacaoBase,
     colunas,
@@ -88,11 +89,10 @@ function TabelaBase({
     campoNome = "nome_fantasia_fn",
     campoSituacao = "situacao",
 }) {
-
     const navigate = useNavigate();
     const { idEmpresa } = useEmpresa();
 
-    function handleEditar(e) {
+    function handleAcaoTopo(e) {
         e.preventDefault();
         navigate(urlDoCoiso);
     }
@@ -147,8 +147,8 @@ function TabelaBase({
                     <a href="/home" className="-a">Retornar</a>
                 </div>
 
-                { edicao ? (
-                    <button type="button" className="botaoEditar" onClick={handleEditar}>
+                {texto && urlDoCoiso ? (
+                    <button type="button" className="botaoEditar" onClick={handleAcaoTopo}>
                         {texto}
                     </button>
                 ) : null}
@@ -179,7 +179,7 @@ function TabelaBase({
                                 {colunas.map((col) => (
                                     <th key={col.key}>{col.label}</th>
                                 ))}
-                                <th>Ações</th>
+                                {(urlEdicaoBase || urlVisualizacaoBase) && <th>Ações</th>}
                             </tr>
                         </thead>
                         <tbody>
@@ -194,14 +194,16 @@ function TabelaBase({
                                         <tr key={id}>
                                             {colunas.map((col) => (
                                                 <td key={col.key}>
-                                                    {col.format ? col.format(linha[col.key]) : String(linha[col.key] ?? "")}
+                                                    {col.format ? col.format(linha[col.key], linha) : String(linha[col.key] ?? "")}
                                                 </td>
                                             ))}
-                                            <td>
-                                                <button type="button" onClick={() => irParaDetalhe(id)}>
-                                                    {edicao ? "Editar" : "Visualizar"}
-                                                </button>
-                                            </td>
+                                            {(urlEdicaoBase || urlVisualizacaoBase) && (
+                                                <td>
+                                                    <button type="button" onClick={() => irParaDetalhe(id)}>
+                                                        {edicao ? "Editar" : "Visualizar"}
+                                                    </button>
+                                                </td>
+                                            )}
                                         </tr>
                                     );
                                 })

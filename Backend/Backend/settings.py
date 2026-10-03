@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'app_admin',
     'app_empresas',
     'app_fornecedores',
+    'app_relatorios',
     'rest_framework',
     'corsheaders',
 ]
