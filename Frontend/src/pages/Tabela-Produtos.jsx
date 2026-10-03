@@ -1,10 +1,10 @@
 import TabelaBase from "../components/modeloTable";
 
 const opcoesOrdenacao = [
-    { value: "decrescente", label: "Ordem Decrescente" },
-    { value: "crescente", label: "Ordem Crescente" },
     { value: "recente", label: "Mais Recente" },
-    { value: "antigo", label: "Mais Antigo" }
+    { value: "antigo", label: "Mais Antigo" },
+    { value: "alfabetico", label: "Alfabético" },
+    { value: "estado", label: "Estado" },
 ]
 
 function TabelaProdutos() {
@@ -16,6 +16,7 @@ function TabelaProdutos() {
             modoInicial="recente"
             edicao={false}
             texto="Adicionar Lote"
+            urlVisualizacaoBase="/visualizar-lote"
             colunas={[
                 { key: "nome", label: "Produto" },
                 { key: "lote", label: "Lote" },

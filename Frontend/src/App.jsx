@@ -28,6 +28,9 @@ function App() {
           <Route path="/gerar-relatorio" element={<GerarRelatorio />} />
           <Route path="/adicionar-lote/:id" element={<AdicionarLote />} />
           <Route path="/adicionar-fornecedor/:id" element={<AdicionarFornecedor />} />
+          <Route path="/adicionar-lote" element={<AdicionarLote />} />
+          <Route path="/visualizar-lote/:id" element={<AdicionarLote />} />
+          <Route path="/visualizar-fornecedor/:id" element={<AdicionarFornecedor />} />
         </Routes>
       </BrowserRouter>
     </EmpresaProvider>

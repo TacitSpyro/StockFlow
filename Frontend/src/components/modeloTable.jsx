@@ -82,6 +82,7 @@ function TabelaBase({
     texto,
     urlDoCoiso,
     urlEdicaoBase,
+    urlVisualizacaoBase,
     colunas,
     campoOrdenacao,
     campoNome = "nome_fantasia_fn",
@@ -94,6 +95,12 @@ function TabelaBase({
     function handleEditar(e) {
         e.preventDefault();
         navigate(urlDoCoiso);
+    }
+
+    function irParaDetalhe(id) {
+        const base = edicao ? urlEdicaoBase : urlVisualizacaoBase;
+        if (!base) return;
+        navigate(`${base}/${id}`);
     }
 
     const [modo, setModo] = useState(modoInicial || opcoesOrdenacao[0]?.value)
@@ -191,11 +198,8 @@ function TabelaBase({
                                                 </td>
                                             ))}
                                             <td>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => navigate(`${urlEdicaoBase}/${id}`)}
-                                                >
-                                                    Editar
+                                                <button type="button" onClick={() => irParaDetalhe(id)}>
+                                                    {edicao ? "Editar" : "Visualizar"}
                                                 </button>
                                             </td>
                                         </tr>

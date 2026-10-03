@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import "./Dropdown.css";
 
-export default function Dropdown({ label, items, as: Tag = "li", name, defaultValue, selected: selectedProp, onSelect }) {
+export default function Dropdown({ label, items, as: Tag = "li", name, defaultValue, selected: selectedProp, onSelect, disabled }) {
   const [open, setOpen] = useState(false);
   const [selectedInterno, setSelectedInterno] = useState(defaultValue ?? null);
   const ref = useRef(null);
@@ -19,10 +19,7 @@ export default function Dropdown({ label, items, as: Tag = "li", name, defaultVa
   function handleSelect(item) {
     setSelectedInterno(item.value);
     setOpen(false);
-
-    if (onSelect) {
-      onSelect(item.value);
-    }
+    if (onSelect) onSelect(item.value);
   }
 
   const selectedLabel = items.find((i) => i.value === selected)?.label;
@@ -36,25 +33,20 @@ export default function Dropdown({ label, items, as: Tag = "li", name, defaultVa
         className="dropdown-toggle"
         aria-haspopup="true"
         aria-expanded={open}
-        onClick={() => setOpen((p) => !p)}
+        disabled={disabled}
+        onClick={() => !disabled && setOpen((p) => !p)}
       >
         {selectedLabel ?? label}
       </button>
 
-      {open && (
+      {open && !disabled && (
         <ul className="dropdown-menu">
           {items.map((item) => (
             <li key={item.value ?? item.href ?? item.label}>
               {item.href ? (
-                <a href={item.href} onClick={() => setOpen(false)}>
-                  {item.label}
-                </a>
+                <a href={item.href} onClick={() => setOpen(false)}>{item.label}</a>
               ) : (
-                <button
-                  type="button"
-                  className={item.value === selected ? "active" : ""}
-                  onClick={() => handleSelect(item)}
-                >
+                <button type="button" className={item.value === selected ? "active" : ""} onClick={() => handleSelect(item)}>
                   {item.label}
                 </button>
               )}

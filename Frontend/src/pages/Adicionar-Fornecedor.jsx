@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import styles from "../styles/Adicionar-fornecedor.module.css"
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useEmpresa } from "../context/EmpresaContext";
 
 function CadastrarFornecedor() {
@@ -8,7 +8,11 @@ function CadastrarFornecedor() {
     const { idEmpresa, idAdmin } = useEmpresa();
     const navigate = useNavigate();
     const { id } = useParams();
-    const modoEdicao = Boolean(id);
+    const location = useLocation();
+
+    const modoEdicao = Boolean(id) && location.pathname.startsWith("/adicionar-fornecedor");
+    const somenteLeitura = Boolean(id) && location.pathname.startsWith("/visualizar-fornecedor");
+    const precisaCarregarDados = modoEdicao || somenteLeitura;
 
     const [form, setForm] = useState({
         razao_social_fn: "",
@@ -31,13 +35,13 @@ function CadastrarFornecedor() {
     const [produtosSelecionados, setProdutosSelecionados] = useState([]);
     const [buscaProduto, setBuscaProduto] = useState("");
 
-    const [carregandoFornecedor, setCarregandoFornecedor] = useState(modoEdicao);
+    const [carregandoFornecedor, setCarregandoFornecedor] = useState(precisaCarregarDados);
 
     function atualizarCampo(campo, valor) {
+        if (somenteLeitura) return;
         setForm((prev) => ({ ...prev, [campo]: valor }));
     }
 
-    // Busca o catálogo geral da empresa (igual já era)
     useEffect(() => {
         if (!idEmpresa) return;
 
@@ -48,9 +52,9 @@ function CadastrarFornecedor() {
 
     }, [idEmpresa]);
 
-    // NOVO: se estiver em modo edição, busca os dados do fornecedor e preenche o form
+    // Busca os dados do fornecedor, tanto pra edição quanto pra visualização
     useEffect(() => {
-        if (!modoEdicao) return;
+        if (!precisaCarregarDados) return;
 
         fetch(`http://localhost:8000/api/fornecedor/${id}/`)
             .then((res) => {
@@ -82,10 +86,12 @@ function CadastrarFornecedor() {
             })
             .finally(() => setCarregandoFornecedor(false));
 
-    }, [id, modoEdicao]);
+    }, [id, precisaCarregarDados]);
 
     async function calcularCep(e) {
         e.preventDefault();
+        if (somenteLeitura) return;
+
         const cepLimpo = form.cep.replace(/\D/g, "");
 
         if (cepLimpo.length !== 8) {
@@ -117,16 +123,19 @@ function CadastrarFornecedor() {
     }
 
     function selecionarProduto(item) {
+        if (somenteLeitura) return;
         if (produtosSelecionados.some((p) => p.id === item.id)) return;
         setProdutosSelecionados((prev) => [...prev, item]);
         setBuscaProduto("");
     }
 
     function removerProduto(id) {
+        if (somenteLeitura) return;
         setProdutosSelecionados((prev) => prev.filter((p) => p.id !== id));
     }
 
     async function criarNovoProduto() {
+        if (somenteLeitura) return;
         const nome = buscaProduto.trim();
         if (!nome) return;
 
@@ -165,6 +174,7 @@ function CadastrarFornecedor() {
 
     async function handleSubmit(e) {
         e.preventDefault();
+        if (somenteLeitura) return;
 
         const corpo = {
             ...form,
@@ -205,10 +215,12 @@ function CadastrarFornecedor() {
         return <p>Carregando dados do fornecedor...</p>;
     }
 
+    const tituloTela = somenteLeitura ? "Visualizar Fornecedor" : modoEdicao ? "Editar Fornecedor" : "Cadastrar Fornecedor";
+
     return (
         <>
             <main>
-                <label>{modoEdicao ? "Editar Fornecedor" : "Cadastrar Fornecedor"}</label>
+                <label>{tituloTela}</label>
                 <form onSubmit={handleSubmit}>
                     <div className={styles.secao1}>
                         <div className={styles.coluna1}>
@@ -218,6 +230,7 @@ function CadastrarFornecedor() {
                                 placeholder="Razão Social"
                                 value={form.razao_social_fn}
                                 onChange={(e) => atualizarCampo("razao_social_fn", e.target.value)}
+                                disabled={somenteLeitura}
                             />
                             <input
                             className={styles.nomeF}
@@ -225,12 +238,14 @@ function CadastrarFornecedor() {
                                 placeholder="Nome Fantasia"
                                 value={form.nome_fantasia_fn}
                                 onChange={(e) => atualizarCampo("nome_fantasia_fn", e.target.value)}
+                                disabled={somenteLeitura}
                             />
                             <input
                                 type="text"
                                 placeholder="CNPJ"
                                 value={form.cnpj_fn}
                                 onChange={(e) => atualizarCampo("cnpj_fn", e.target.value)}
+                                disabled={somenteLeitura}
                             />
                         </div>
                         <div className={styles.coluna2}>
@@ -240,18 +255,21 @@ function CadastrarFornecedor() {
                                 value={form.cep}
                                 onChange={(e) => atualizarCampo("cep", e.target.value)}
                                 onBlur={calcularCep}
+                                disabled={somenteLeitura}
                             />
                             <input
                                 type="text"
                                 placeholder="Número"
                                 value={form.numero}
                                 onChange={(e) => atualizarCampo("numero", e.target.value)}
+                                disabled={somenteLeitura}
                             />
                             <input
                                 type="text"
                                 placeholder="Complemento (opcional)"
                                 value={form.complemento}
                                 onChange={(e) => atualizarCampo("complemento", e.target.value)}
+                                disabled={somenteLeitura}
                             />
                         </div>
                         <div className={styles.secao2}>
@@ -261,18 +279,21 @@ function CadastrarFornecedor() {
                                     placeholder="Email"
                                     value={form.email_fn}
                                     onChange={(e) => atualizarCampo("email_fn", e.target.value)}
+                                    disabled={somenteLeitura}
                                 />
                                 <input
                                     type="text"
                                     placeholder="Nome do Responsável"
                                     value={form.nome_responsavel}
                                     onChange={(e) => atualizarCampo("nome_responsavel", e.target.value)}
+                                    disabled={somenteLeitura}
                                 />
                                 <input
                                     type="text"
                                     placeholder="Telefone"
                                     value={form.telefone_fn}
                                     onChange={(e) => atualizarCampo("telefone_fn", e.target.value)}
+                                    disabled={somenteLeitura}
                                 />
 
                                 <input
@@ -281,6 +302,7 @@ function CadastrarFornecedor() {
                                     onChange={(e) => atualizarCampo("ativo", e.target.checked)}
                                     name="ativo"
                                     id="ativo"
+                                    disabled={somenteLeitura}
                                 />
                                 <label htmlFor="ativo">Ativo</label>
                             </div>
@@ -294,40 +316,48 @@ function CadastrarFornecedor() {
                             {produtosSelecionados.map((p) => (
                                 <span key={p.id} className={styles.tag}>
                                     {p.nome}
-                                    <button type="button" onClick={() => removerProduto(p.id)}>×</button>
+                                    {!somenteLeitura && (
+                                        <button type="button" onClick={() => removerProduto(p.id)}>×</button>
+                                    )}
                                 </span>
                             ))}
                         </div>
 
-                        <input
-                            type="text"
-                            placeholder="Buscar ou criar produto..."
-                            value={buscaProduto}
-                            onChange={(e) => setBuscaProduto(e.target.value)}
-                        />
+                        {!somenteLeitura && (
+                            <>
+                                <input
+                                    type="text"
+                                    placeholder="Buscar ou criar produto..."
+                                    value={buscaProduto}
+                                    onChange={(e) => setBuscaProduto(e.target.value)}
+                                />
 
-                        {buscaProduto && (
-                            <ul className={styles.listaSugestoes}>
-                                {sugestoes.map((item) => (
-                                    <li key={item.id}>
-                                        <button type="button" onClick={() => selecionarProduto(item)}>
-                                            {item.nome}
-                                        </button>
-                                    </li>
-                                ))}
+                                {buscaProduto && (
+                                    <ul className={styles.listaSugestoes}>
+                                        {sugestoes.map((item) => (
+                                            <li key={item.id}>
+                                                <button type="button" onClick={() => selecionarProduto(item)}>
+                                                    {item.nome}
+                                                </button>
+                                            </li>
+                                        ))}
 
-                                {!existeExato && buscaProduto.trim() && (
-                                    <li>
-                                        <button type="button" onClick={criarNovoProduto}>
-                                            Criar "{buscaProduto.trim()}"
-                                        </button>
-                                    </li>
+                                        {!existeExato && buscaProduto.trim() && (
+                                            <li>
+                                                <button type="button" onClick={criarNovoProduto}>
+                                                    Criar "{buscaProduto.trim()}"
+                                                </button>
+                                            </li>
+                                        )}
+                                    </ul>
                                 )}
-                            </ul>
+                            </>
                         )}
                     </div>
 
-                    <button type="submit">{modoEdicao ? "Salvar Alterações" : "Cadastrar"}</button>
+                    {!somenteLeitura && (
+                        <button type="submit">{modoEdicao ? "Salvar Alterações" : "Cadastrar"}</button>
+                    )}
                 </form>
             </main>
         </>
