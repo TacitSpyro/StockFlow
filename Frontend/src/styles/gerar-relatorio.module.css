@@ -1,0 +1,15 @@
+.topbar{
+    display: flex;
+    align-items: center;
+    padding: 1rem 2rem;
+    background: #fff;
+    border-bottom: 1px solid #000;
+}
+
+a{
+    font-weight: 700;
+    font-size: 1.25rem;
+    text-decoration: none;
+    margin-right: 66%;
+    font-family: "Montserrat", sans-serif;
+}
