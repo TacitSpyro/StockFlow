@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useEmpresa } from "../context/EmpresaContext";
 import Dropdown from "../components/Dropdown";
+import retornar from "../assets/Retornar.png";
+import styles from "../styles/gerar-relatorio.module.css";
 
 const tipos = [
     { value: "TODOS", label: "Todos" },
@@ -62,6 +64,10 @@ function GerarRelatorio() {
 
     return (
         <>
+            <div className={styles.topbar}>
+                <img src={retornar} alt="retornar" className="navbar-img"/>
+                <a href="/visualizar-relatorios">Cancelar</a>
+            </div>
             <main>
                 <label>Gerar Relatório</label>
 
