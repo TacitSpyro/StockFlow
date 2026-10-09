@@ -9,6 +9,6 @@ class ProdutoSerializer(serializers.ModelSerializer):
         model = Produto
         fields = [
             "id", "nome", "lote", "estoque_atual", "estoque_capacidade",
-            "situacao", "data_fabricacao", "data_encerramento", "ala", "secao", "prateleira",
+            "situacao", "data_fabricacao", "data_cadastro", "data_encerramento", "ala", "secao", "prateleira",
             "descricao", "fornecedor_nome", "data_cadastro",
         ]

@@ -22,6 +22,10 @@ const SITUACAO_COR = {
   BLOQUEIO: "#e74c3c",
 };
 
+// Um lote entra em "estoque baixo" quando está com 20% ou menos da capacidade
+const LIMITE_ESTOQUE_BAIXO = 0.2;
+const QTD_LINHAS = 4;
+
 function Home() {
 
   const { idEmpresa } = useEmpresa();
@@ -72,6 +76,33 @@ function Home() {
     }));
   }, [produtos]);
 
+  // Os lotes mais recentemente cadastrados
+  const ultimosCadastros = useMemo(() => {
+    return produtos
+      .filter((p) => p.situacao !== "ENCERRADO")
+      .sort((a, b) => new Date(b.data_cadastro) - new Date(a.data_cadastro))
+      .slice(0, QTD_LINHAS);
+  }, [produtos]);
+
+  const estoqueBaixo = useMemo(() => {
+  const porMaterial = {};
+
+  produtos.forEach((p) => {
+    if (p.situacao !== "ATIVO") return;
+
+    if (!porMaterial[p.nome]) {
+      porMaterial[p.nome] = { nome: p.nome, disponivel: 0, capacidade: 0 };
+    }
+
+    porMaterial[p.nome].disponivel += p.estoque_atual;
+    porMaterial[p.nome].capacidade += p.estoque_capacidade;
+  });
+
+  return Object.values(porMaterial)
+    .filter((m) => m.capacidade > 0 && m.disponivel / m.capacidade <= LIMITE_ESTOQUE_BAIXO)
+    .sort((a, b) => a.disponivel / a.capacidade - b.disponivel / b.capacidade)
+    .slice(0, QTD_LINHAS);
+}, [produtos]);
   return (
     <>
       <Navbar links={homeLinks} />
@@ -128,6 +159,57 @@ function Home() {
             </ResponsiveContainer>
           )}
         </div>
+
+        {/* Seção de listas */}
+        {!carregando && !erro && (
+          <div className={styles.paineis}>
+
+            <section className={styles.painel}>
+              <h3 className={styles.painelTitulo}>Últimos cadastros</h3>
+
+              <div className={styles.tabelaMini}>
+                <div className={styles.celulaHeader}>Nome</div>
+                <div className={styles.celulaHeader}>Data</div>
+
+                {ultimosCadastros.length === 0 ? (
+                  <div className={`${styles.celula} ${styles.vazio}`}>Nenhum lote cadastrado</div>
+                ) : (
+                  ultimosCadastros.map((p) => (
+                    <div key={p.id} className={styles.linhaMini}>
+                      <div className={styles.celula}>{p.nome} — {p.lote}</div>
+                      <div className={styles.celula}>
+                        {new Date(p.data_cadastro).toLocaleDateString("pt-BR")}
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </section>
+
+            <section className={styles.painel}>
+              <h3 className={styles.painelTitulo}>Materiais em estoque baixo</h3>
+
+              <div className={styles.tabelaMini}>
+                <div className={styles.celulaHeader}>Nome</div>
+                <div className={styles.celulaHeader}>Estoque</div>
+
+                {estoqueBaixo.length === 0 ? (
+                  <div className={`${styles.celula} ${styles.vazio}`}>Nenhum material com estoque baixo</div>
+                ) : (
+                estoqueBaixo.map((m) => (
+                  <div key={m.nome} className={styles.linhaMini}>
+                    <div className={styles.celula}>{m.nome}</div>
+                    <div className={styles.celula}>
+                      {m.disponivel}/{m.capacidade}
+                    </div>
+                  </div>
+                ))
+                )}
+              </div>
+            </section>
+
+          </div>
+        )}
       </main>
     </>
   );
