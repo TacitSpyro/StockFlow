@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import styles from "../styles/Adicionar-fornecedor.module.css"
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useEmpresa } from "../context/EmpresaContext";
+import retornar from "../assets/Retornar.png"
 
 function CadastrarFornecedor() {
 
@@ -13,6 +14,10 @@ function CadastrarFornecedor() {
     const modoEdicao = Boolean(id) && location.pathname.startsWith("/adicionar-fornecedor");
     const somenteLeitura = Boolean(id) && location.pathname.startsWith("/visualizar-fornecedor");
     const precisaCarregarDados = modoEdicao || somenteLeitura;
+
+    const handleClick = () => {
+         navigate('/edição/fornecedores');
+    }
 
     const [form, setForm] = useState({
         razao_social_fn: "",
@@ -219,92 +224,137 @@ function CadastrarFornecedor() {
 
     return (
         <>
-            <main>
-                <label>{tituloTela}</label>
+
+            <div className={styles.topbar}>
+                <img src={retornar} alt="retornar" className="navbar-img"/>
+                <a href="/edição/fornecedores">{somenteLeitura ? "Voltar" : "Retornar"}</a>
+            </div>
+
+            <main className={styles.main}>
+                
                 <form onSubmit={handleSubmit}>
+                    <div className={styles.emcima}>
+                        <label>{tituloTela}</label>
+                        <div style={{fontSize: '120%'}}>
+                            <input
+                                type="checkbox"
+                                checked={form.ativo}
+                                onChange={(e) => atualizarCampo("ativo", e.target.checked)}
+                                name="ativo"
+                                id="ativo"
+                                disabled={somenteLeitura}
+                                />
+                            <label htmlFor="ativo">Ativo</label>
+                        </div>
+                    </div>
                     <div className={styles.secao1}>
+                        <label>Dados da empresa</label>
                         <div className={styles.coluna1}>
-                            <input
-                                className={styles.razao}
-                                type="text"
-                                placeholder="Razão Social"
-                                value={form.razao_social_fn}
-                                onChange={(e) => atualizarCampo("razao_social_fn", e.target.value)}
-                                disabled={somenteLeitura}
-                            />
-                            <input
-                            className={styles.nomeF}
-                                type="text"
-                                placeholder="Nome Fantasia"
-                                value={form.nome_fantasia_fn}
-                                onChange={(e) => atualizarCampo("nome_fantasia_fn", e.target.value)}
-                                disabled={somenteLeitura}
-                            />
-                            <input
-                                type="text"
-                                placeholder="CNPJ"
-                                value={form.cnpj_fn}
-                                onChange={(e) => atualizarCampo("cnpj_fn", e.target.value)}
-                                disabled={somenteLeitura}
-                            />
+                            <div className={styles.concatenar}>
+                                <label>Razão Social</label>
+                                <input
+                                    className={styles.razao}
+                                    type="text"
+                                    placeholder="Razão Social"
+                                    value={form.razao_social_fn}
+                                    onChange={(e) => atualizarCampo("razao_social_fn", e.target.value)}
+                                    disabled={somenteLeitura}
+                                />
+                            </div>
+                            <div className={styles.concatenar}>
+                                <label>Nome Fantasia</label>
+                                <input
+                                className={styles.nomeF}
+                                    type="text"
+                                    placeholder="Nome Fantasia"
+                                    value={form.nome_fantasia_fn}
+                                    onChange={(e) => atualizarCampo("nome_fantasia_fn", e.target.value)}
+                                    disabled={somenteLeitura}
+                                />
+                            </div>
+                            <div className={styles.concatenar}>
+                                <label>CNPJ</label>
+                                <input
+                                    type="text"
+                                    placeholder="CNPJ"
+                                    value={form.cnpj_fn}
+                                    onChange={(e) => atualizarCampo("cnpj_fn", e.target.value)}
+                                    disabled={somenteLeitura}
+                                />
+                            </div>
                         </div>
                         <div className={styles.coluna2}>
-                            <input
-                                type="text"
-                                placeholder="CEP"
-                                value={form.cep}
-                                onChange={(e) => atualizarCampo("cep", e.target.value)}
-                                onBlur={calcularCep}
-                                disabled={somenteLeitura}
-                            />
-                            <input
-                                type="text"
-                                placeholder="Número"
-                                value={form.numero}
-                                onChange={(e) => atualizarCampo("numero", e.target.value)}
-                                disabled={somenteLeitura}
-                            />
-                            <input
-                                type="text"
-                                placeholder="Complemento (opcional)"
-                                value={form.complemento}
-                                onChange={(e) => atualizarCampo("complemento", e.target.value)}
-                                disabled={somenteLeitura}
-                            />
+                            <label>Endereço</label>
+                            <div style={{display: 'flex', marginTop: '1%'}}>
+                                <div className={styles.concatenar} style={{marginRight: '15%'}}>
+                                    <label>CEP</label>
+                                    <input
+                                        type="text"
+                                        placeholder="00000-000"
+                                        value={form.cep}
+                                        onChange={(e) => atualizarCampo("cep", e.target.value)}
+                                        onBlur={calcularCep}
+                                        disabled={somenteLeitura}
+                                    />
+                                </div>
+                                <div className={styles.concatenar} style={{marginRight: '15%'}}>
+                                    <label>Número</label>
+                                    <input
+                                        type="text"
+                                        placeholder="Número"
+                                        value={form.numero}
+                                        onChange={(e) => atualizarCampo("numero", e.target.value)}
+                                        disabled={somenteLeitura}
+                                    />
+                                </div>
+                                <div className={styles.concatenar}>
+                                    <label>Complemento(opcional)</label>
+                                    <input
+                                        type="text"
+                                        placeholder="Complemento"
+                                        value={form.complemento}
+                                        onChange={(e) => atualizarCampo("complemento", e.target.value)}
+                                        disabled={somenteLeitura}
+                                        style={{width: '315%'}}
+                                    />
+                                </div>
+                            </div>
                         </div>
                         <div className={styles.secao2}>
-                            <div className={styles.coluna3}>
-                                <input
-                                    type="email"
-                                    placeholder="Email"
-                                    value={form.email_fn}
-                                    onChange={(e) => atualizarCampo("email_fn", e.target.value)}
-                                    disabled={somenteLeitura}
-                                />
-                                <input
-                                    type="text"
-                                    placeholder="Nome do Responsável"
-                                    value={form.nome_responsavel}
-                                    onChange={(e) => atualizarCampo("nome_responsavel", e.target.value)}
-                                    disabled={somenteLeitura}
-                                />
-                                <input
-                                    type="text"
-                                    placeholder="Telefone"
-                                    value={form.telefone_fn}
-                                    onChange={(e) => atualizarCampo("telefone_fn", e.target.value)}
-                                    disabled={somenteLeitura}
-                                />
-
-                                <input
-                                    type="checkbox"
-                                    checked={form.ativo}
-                                    onChange={(e) => atualizarCampo("ativo", e.target.checked)}
-                                    name="ativo"
-                                    id="ativo"
-                                    disabled={somenteLeitura}
-                                />
-                                <label htmlFor="ativo">Ativo</label>
+                            <label style={{marginBottom: '1%'}}>Contato</label>
+                            <div className={styles.coluna3} style={{marginBottom: '3%'}}>
+                                <div className={styles.concatenar} style={{marginRight: '25%'}}>
+                                    <label>Email</label>
+                                    <input
+                                        type="email"
+                                        placeholder="Email"
+                                        value={form.email_fn}
+                                        onChange={(e) => atualizarCampo("email_fn", e.target.value)}
+                                        disabled={somenteLeitura}
+                                        style={{width: '170%'}}
+                                    />
+                                </div>
+                                <div className={styles.concatenar} style={{marginRight: '35%'}}>
+                                    <label>Nome do Responsável</label>
+                                    <input
+                                        type="text"
+                                        placeholder="Nome do Responsável"
+                                        value={form.nome_responsavel}
+                                        onChange={(e) => atualizarCampo("nome_responsavel", e.target.value)}
+                                        disabled={somenteLeitura}
+                                        style={{width: '240%'}}
+                                    />
+                                </div>
+                                <div className={styles.concatenar}>
+                                    <label>Telefone</label>
+                                    <input
+                                        type="text"
+                                        placeholder="(00) 00000-0000"
+                                        value={form.telefone_fn}
+                                        onChange={(e) => atualizarCampo("telefone_fn", e.target.value)}
+                                        disabled={somenteLeitura}
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -336,7 +386,7 @@ function CadastrarFornecedor() {
                                     <ul className={styles.listaSugestoes}>
                                         {sugestoes.map((item) => (
                                             <li key={item.id}>
-                                                <button type="button" onClick={() => selecionarProduto(item)}>
+                                                <button className={styles.botaoDaLista} type="button" onClick={() => selecionarProduto(item)}>
                                                     {item.nome}
                                                 </button>
                                             </li>
@@ -344,7 +394,7 @@ function CadastrarFornecedor() {
 
                                         {!existeExato && buscaProduto.trim() && (
                                             <li>
-                                                <button type="button" onClick={criarNovoProduto}>
+                                                <button className={styles.botaoCriar} type="button" onClick={criarNovoProduto}>
                                                     Criar "{buscaProduto.trim()}"
                                                 </button>
                                             </li>
@@ -355,9 +405,12 @@ function CadastrarFornecedor() {
                         )}
                     </div>
 
-                    {!somenteLeitura && (
-                        <button type="submit">{modoEdicao ? "Salvar Alterações" : "Cadastrar"}</button>
-                    )}
+                    <div style={{display: 'flex'}}>
+                        <button className={styles.retornar} type="button" onClick={handleClick}>Cancelar</button>
+                        {!somenteLeitura && (
+                            <button className={styles.cadastrar} type="submit">{modoEdicao ? "Salvar Alterações" : "Cadastrar"}</button>
+                        )}
+                    </div>
                 </form>
             </main>
         </>

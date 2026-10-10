@@ -1,6 +1,13 @@
+.main{
+  margin-left: 5%;
+  width: 95%;
+  padding-left: 5%;
+}
+
 .secao1{
     display: flex;
     flex-direction: column;
+    margin-top: 1%;
 }
 
 .coluna1{
@@ -11,17 +18,21 @@
 }
 
 .razao{
-  min-width: 30% !important;
+  min-width: 260% !important;
 }
 
+.emcima{
+  display: flex;
+  justify-content: space-between ! important;
+}
 .nomeF{
-  min-width: 30%;
+  min-width: 220%;
 }
 
 .coluna2{
     display: flex;
     flex-direction: column;
-    margin-top: 1%;
+    margin-top: 2%;
     gap: 8%;
 }
 
@@ -29,6 +40,10 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+.secaoProdutos input{
+  height: 60%;
 }
 
 .tagsSelecionadas {
@@ -51,4 +66,94 @@
   border: 1px solid #ccc;
   max-height: 150px;
   overflow-y: auto;
+}
+
+.topbar{
+    display: flex;
+    align-items: center;
+    padding: 1rem 2rem;
+    background: #fff;
+    border-bottom: 1px solid #000;
+}
+
+.secao2{
+  margin-top: 3%;
+  display: flex;
+  flex-direction: column;
+}
+
+.secao2 label{
+  font-size: 140%;
+}
+
+.coluna3{
+  display: flex;
+}
+
+.secao1 label{
+  font-size: 140%;
+}
+
+.concatenar{
+  display: flex;
+  flex-direction: column;
+  min-width: fit-content;
+  min-height: fit-content;
+}
+
+.concatenar input{
+  height: 60%;
+  font-size: 100%;
+  border-radius: 13px;
+}
+
+.concatenar label{
+  font-size: 100%;
+}
+
+.botaoDaLista{
+  border-radius: 5px;
+  margin-bottom: 0.2%;
+  background-color: white;
+  border-width: 1px;
+  font-size: 100%;
+}
+
+.botaoCriar{
+  border-radius: 5px;
+  margin-top: 0.5%;
+  background-color: #3060FF;
+  border-width: 1px;
+  font-size: 100%;
+  color: white;
+}
+
+.cadastrar{
+  margin-top: 2%;
+  background-color: #3060FF;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 150%;
+  padding: 0.6rem;
+  margin-left: 1%;
+}
+
+.cadastrar:hover{
+  background-color: #103ed8;
+}
+
+.retornar{
+  margin-top: 2%;
+  border-radius: 10px;
+  font-size: 150%;
+  padding: 0.6rem;
+  margin-left: 83%;
+  background-color: white;
+  border: solid;
+  border-width: 1px;
+}
+
+.retornar:hover{
+  background-color: rgb(214, 214, 214);
 }
