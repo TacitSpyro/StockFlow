@@ -9,8 +9,16 @@
   flex-direction: column;
 }
 
+.coluna{
+    display: flex;
+    flex-direction: column;
+    height: 10%;
+}
+
 p{
     font-family: 'Montserrat';
+    margin-top: 8px;
+    margin-bottom: 8px;
 }
 
 .topbar{
@@ -30,10 +38,12 @@ a{
 }
 
 .container{
-    padding: 1.2rem;
+    padding-top: 2%;
+    padding-left: 5%;
+    padding-bottom: 2%;
     border-radius: 10px 0px 0px 10px;
     background-color: #fff;
-    margin: 3% 0 0 10%;
+    margin: 3% 0 5% 5%;
 }
 
 .loteF{
@@ -50,14 +60,6 @@ a{
     padding: 4px;
 }
 
-.sdd2{
-    align-self: center;
-    border: solid 1px;
-    border-color: #a7a7a7;
-    border-radius: 20px;
-    padding: 4px;
-    margin-right: 10%;
-}
 
 input{
     padding:0.5rem;
@@ -67,10 +69,7 @@ input{
     border-width: 1px;
 }
 
-.cima{
-    display: flex;
-    flex-direction: column;
-}
+
 
 .quant{
     margin-top: 3%;
@@ -78,25 +77,27 @@ input{
 }
 
 .linha1{
-    margin-top: 3%;
+    width: 95%;
     display: flex;
+    margin-top: 1%;
     justify-content: space-between;
 }
 
 .linha2{
     display: flex;
-    justify-content: space-between;
-    gap: 30px;
+    flex-direction: column;
 }
 
 small{
     font-family: 'Montserrat';
+    font-size: 100%;
+    margin-bottom: 3%;
 }
 
 .linha3{
     margin-top: 3%;
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
 }
 
 .linha4{
@@ -132,6 +133,32 @@ small{
     max-width: 70%;
 }
 
-.linha0{
-    display: flex;
+.add{
+    margin-top: 2%;
+    background-color: #3060FF;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 150%;
+    padding: 0.6rem;
+    margin-left: 1%;
+}
+
+.add:hover{
+    background-color: #103ed8;
+}
+
+.retornar{
+  margin-top: 2%;
+  border-radius: 10px;
+  font-size: 150%;
+  padding: 0.6rem;
+  margin-left: 72%;
+  background-color: white;
+  border: solid;
+  border-width: 1px;
+}
+
+.retornar:hover{
+  background-color: rgb(214, 214, 214);
 }
