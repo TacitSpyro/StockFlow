@@ -30,6 +30,10 @@ function AdicionarLote() {
     const [secaoSelecionada, setSecaoSelecionada] = useState(null);
     const [prateleiraSelecionada, setPrateleiraSelecionada] = useState(null);
 
+    const handleClick = () => {
+         navigate('/edição/produtos');
+    }
+
     const [form, setForm] = useState({
         lote: "",
         estoque_atual: "",
@@ -60,6 +64,12 @@ function AdicionarLote() {
         {value: "5", label:"Quinta"}, {value: "6", label:"Sexta"},
         {value: "7", label:"Sétima"}, {value: "8", label:"Oitava"}
     ]
+
+    function handleSelecionarFornecedor(valor) {
+        if (somenteLeitura) return;
+        setFornecedorSelecionado(valor);
+        setMaterialSelecionado(null);
+    }
 
     function atualizarCampo(campo, valor) {
         if (somenteLeitura) return; // trava edição
@@ -199,168 +209,73 @@ function AdicionarLote() {
             </div>
 
             <form onSubmit={registrarLote} className={styles.container}>
-                <label>{tituloTela}</label>
-
-                <div className={styles.cadLot}>
+                <div style={{display: 'flex', flexDirection: 'column'}}>
+                    <label style={{fontSize: '250%'}}>{tituloTela}</label>
+                    <label htmlFor="Origem" style={{marginTop: '3%'}}>Origem</label>
+                </div>
                     <div className={styles.linha1}>
-                        <div>
-                            <label htmlFor="fornecedor">Fornecedor</label>
-                            <div className={styles.segura}>
-                                {carregando && <p>Carregando fornecedores...</p>}
-                                {erro && <p>{erro}</p>}
-                                {!carregando && !erro && (
-                                    <Dropdown
-                                        as="div"
-                                        label={
-                                            fornecedorSelecionado
-                                                ? fornecedores.find(f => f.value === fornecedorSelecionado)?.label
-                                                : "Selecione um fornecedor"
-                                        }
-                                        items={fornecedores}
-                                        selected={fornecedorSelecionado}
-                                        onSelect={selecionarComTravar(setFornecedorSelecionado)}
-                                        disabled={somenteLeitura}
-                                    />
-                                )}
+            
+                            <div className={styles.coluna}>
+                                <small>Fornecedor</small>
+                                <div className={styles.segura}>
+                                    {carregando && <p>Carregando fornecedores...</p>}
+                                    {erro && <p>{erro}</p>}
+                                    {!carregando && !erro && (
+                                        <Dropdown
+                                            as="div"
+                                            label={
+                                                fornecedorSelecionado
+                                                    ? fornecedores.find(f => f.value === fornecedorSelecionado)?.label
+                                                    : "Selecione um fornecedor"
+                                            }
+                                            items={fornecedores}
+                                            selected={fornecedorSelecionado}
+                                            onSelect={handleSelecionarFornecedor}
+                                            disabled={somenteLeitura}
+                                        />
+                                    )}
+                                </div>
                             </div>
-                        </div>
+                        
 
                         <div>
-                            <label htmlFor="material">Produto</label>
-                            <div className={styles.segura}>
-                                {!fornecedorSelecionado && <p>Selecione um fornecedor primeiro</p>}
-                                {carregandoTipos && <p>Carregando produtos...</p>}
-                                {fornecedorSelecionado && !carregandoTipos && (
-                                    <Dropdown
-                                        as="div"
-                                        label={
-                                            materialSelecionado
-                                                ? tipos.find(t => t.value === materialSelecionado)?.label
-                                                : "Selecione um material"
-                                        }
-                                        items={tipos}
-                                        selected={materialSelecionado}
-                                        onSelect={selecionarComTravar(setMaterialSelecionado)}
-                                        disabled={somenteLeitura}
-                                    />
-                                )}
+                            <div className={styles.coluna}>
+                                <small>Produto</small>
+                                <div className={styles.segura}>
+                                    {!fornecedorSelecionado && <p>Selecione um fornecedor primeiro</p>}
+                                    {carregandoTipos && <p>Carregando produtos...</p>}
+                                    {fornecedorSelecionado && !carregandoTipos && (
+                                        <Dropdown
+                                            as="div"
+                                            label={
+                                                materialSelecionado
+                                                    ? tipos.find(t => t.value === materialSelecionado)?.label ?? "Selecione um material"
+                                                    : "Selecione um material"
+                                            }
+                                            items={tipos}
+                                            selected={materialSelecionado}
+                                            onSelect={selecionarComTravar(setMaterialSelecionado)}
+                                            disabled={somenteLeitura}
+                                        />
+                                    )}
+                                </div>
                             </div>
                         </div>
-
-                        <div className={styles.linha2}>
-                            <div className={styles.cima}>
-                                <label>Estoque Atual</label>
+                        <div className={styles.coluna}>
+                            <div className={styles.coluna}>
+                                <small>Lote do Fornecedor</small>
                                 <input
-                                    type="number"
-                                    placeholder="0"
-                                    className={styles.quant}
-                                    value={form.estoque_atual}
-                                    onChange={(e) => atualizarCampo("estoque_atual", e.target.value)}
-                                    disabled={somenteLeitura}
-                                />
-                            </div>
-                            <div className={styles.cima}>
-                                <label>Capacidade</label>
-                                <input
-                                    type="number"
-                                    placeholder="100"
-                                    className={styles.quant}
-                                    value={form.estoque_capacidade}
-                                    onChange={(e) => atualizarCampo("estoque_capacidade", e.target.value)}
+                                    type="text"
+                                    placeholder="Ex: L 2026 A24"
+                                    className={styles.loteF}
+                                    value={form.lote}
+                                    onChange={(e) => atualizarCampo("lote", e.target.value)}
                                     disabled={somenteLeitura}
                                 />
                             </div>
                         </div>
-
-                        <div>
-                            <label htmlFor="situacao">Situação</label>
-                            <div className={styles.sdd}>
-                                <Dropdown
-                                    as="div"
-                                    label={
-                                        situacaoSelecionada
-                                            ? situacao.find(s => s.value === situacaoSelecionada)?.label
-                                            : "Situação"
-                                    }
-                                    items={situacao}
-                                    selected={situacaoSelecionada}
-                                    onSelect={selecionarComTravar(setSituacaoSelecionada)}
-                                    disabled={somenteLeitura}
-                                />
-                            </div>
-                        </div>
-                    </div>
-
-                    {situacaoSelecionada === "ENCERRADO" && (
-                        <div className={styles.linha5}>
-                            <label>Data de Encerramento</label>
-                            <input
-                                type="date"
-                                className={styles.data}
-                                value={form.data_encerramento}
-                                onChange={(e) => atualizarCampo("data_encerramento", e.target.value)}
-                                disabled={somenteLeitura}
-                            />
-                            {!somenteLeitura && <small>Se não preencher, será usada a data/hora do registro</small>}
-                        </div>
-                    )}
-
-                    <div className={styles.linha3}>
-                        <div className={styles.cima}>
-                            <label htmlFor="Lote">Lote do Fornecedor</label>
-                            <input
-                                type="text"
-                                placeholder="Ex: L 2026 A24"
-                                className={styles.loteF}
-                                value={form.lote}
-                                onChange={(e) => atualizarCampo("lote", e.target.value)}
-                                disabled={somenteLeitura}
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor="ala">Ala</label>
-                            <div className={styles.segura}>
-                                <Dropdown
-                                    as="div"
-                                    label={alaSelecionada ? ala.find(a => a.value === alaSelecionada)?.label : "Ala"}
-                                    items={ala}
-                                    selected={alaSelecionada}
-                                    onSelect={selecionarComTravar(setAlaSelecionada)}
-                                    disabled={somenteLeitura}
-                                />
-                            </div>
-                        </div>
-                        <div>
-                            <label htmlFor="secao">Seção</label>
-                            <div className={styles.segura}>
-                                <Dropdown
-                                    as="div"
-                                    label={secaoSelecionada ? secao.find(s => s.value === secaoSelecionada)?.label : "Seção"}
-                                    items={secao}
-                                    selected={secaoSelecionada}
-                                    onSelect={selecionarComTravar(setSecaoSelecionada)}
-                                    disabled={somenteLeitura}
-                                />
-                            </div>
-                        </div>
-                        <div>
-                            <label htmlFor="prateleira">Prateleira</label>
-                            <div className={styles.segura}>
-                                <Dropdown
-                                    as="div"
-                                    label={prateleiraSelecionada ? prateleira.find(p => p.value === prateleiraSelecionada)?.label : "Prateleira"}
-                                    items={prateleira}
-                                    selected={prateleiraSelecionada}
-                                    onSelect={selecionarComTravar(setPrateleiraSelecionada)}
-                                    disabled={somenteLeitura}
-                                />
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className={styles.campodata}>
                         <div className={styles.linha6}>
-                            <label>Data de Fabricação</label>
+                            <small>Data de Fabricação</small>
                             <input
                                 type="date"
                                 className={styles.data}
@@ -369,24 +284,136 @@ function AdicionarLote() {
                                 disabled={somenteLeitura}
                             />
                         </div>
+                    </div>            
+                        <div className={styles.linha2}>
+                            <label htmlFor="Estoque" style={{marginTop: '1%', marginBottom: '1%'}}>Estoque</label>
+                            <div style={{display: 'flex'}}>
+                                <div className={styles.coluna}>
+                                    <small>Estoque Atual</small>
+                                    <input
+                                        style={{width: '500px', margin: '0'}}
+                                        type="number"
+                                        placeholder="0"
+                                        className={styles.quant}
+                                        value={form.estoque_atual}
+                                        onChange={(e) => atualizarCampo("estoque_atual", e.target.value)}
+                                        disabled={somenteLeitura}
+                                    />
+                                </div>
+                                <div className={styles.coluna}>
+                                    <small>Capacidade</small>
+                                    <input
+                                        style={{width: '500px', margin: '0'}}
+                                        type="number"
+                                        placeholder="100"
+                                        className={styles.quant}
+                                        value={form.estoque_capacidade}
+                                        onChange={(e) => atualizarCampo("estoque_capacidade", e.target.value)}
+                                        disabled={somenteLeitura}
+                                    />
+                                </div>
+                                <div className={styles.coluna}>
+                                    <small style={{marginBottom: '1%'}}>Situação</small>
+                                    <div className={styles.sdd}>
+                                        <Dropdown
+                                            as="div"
+                                            label={
+                                                situacaoSelecionada
+                                                    ? situacao.find(s => s.value === situacaoSelecionada)?.label
+                                                    : "Situação"
+                                            }
+                                            items={situacao}
+                                            selected={situacaoSelecionada}
+                                            onSelect={selecionarComTravar(setSituacaoSelecionada)}
+                                            disabled={somenteLeitura}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    {situacaoSelecionada === "ENCERRADO" && (
+                        <div className={styles.linha5}>
+                            <label style={{marginBottom: '1%'}}>Data de Encerramento</label>
+                            <input
+                                type="date"
+                                className={styles.data}
+                                value={form.data_encerramento}
+                                onChange={(e) => atualizarCampo("data_encerramento", e.target.value)}
+                                disabled={somenteLeitura}
+                                style={{width: '94%'}}
+                            />
+                            {!somenteLeitura && <small>Se não preencher, será usada a data/hora do registro</small>}
+                        </div>
+                    )}
+
+                    <div className={styles.linha3}>
+                        <label htmlFor="Localizacao" style={{marginBottom: '1%'}}>Localização</label>
+                        <div style={{display: 'flex', justifyContent: 'space-between', width: '70%'}}>
+                            <div>
+                                <small>Ala</small>
+                                <div className={styles.segura}>
+                                    <Dropdown
+                                        as="div"
+                                        label={alaSelecionada ? ala.find(a => a.value === alaSelecionada)?.label : "Ala"}
+                                        items={ala}
+                                        selected={alaSelecionada}
+                                        onSelect={selecionarComTravar(setAlaSelecionada)}
+                                        disabled={somenteLeitura}
+                                    />
+                                </div>
+                            </div>
+                            <div>
+                                <small>Seção</small>
+                                <div className={styles.segura}>
+                                    <Dropdown
+                                        as="div"
+                                        label={secaoSelecionada ? secao.find(s => s.value === secaoSelecionada)?.label : "Seção"}
+                                        items={secao}
+                                        selected={secaoSelecionada}
+                                        onSelect={selecionarComTravar(setSecaoSelecionada)}
+                                        disabled={somenteLeitura}
+                                    />
+                                </div>
+                            </div>
+                            <div>
+                                <small>Prateleira</small>
+                                <div className={styles.segura}>
+                                    <Dropdown
+                                        as="div"
+                                        label={prateleiraSelecionada ? prateleira.find(p => p.value === prateleiraSelecionada)?.label : "Prateleira"}
+                                        items={prateleira}
+                                        selected={prateleiraSelecionada}
+                                        onSelect={selecionarComTravar(setPrateleiraSelecionada)}
+                                        disabled={somenteLeitura}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className={styles.campodata}>
                         <div className={styles.linha6}>
-                            <label>Descrição (opcional)</label>
+                            <label style={{marginBottom: '3%'}}>Descrição (opcional)</label>
                             <input
                                 type="text"
+                                placeholder="Observações sobre o lote"
                                 className={styles.data}
                                 value={form.descricao}
                                 onChange={(e) => atualizarCampo("descricao", e.target.value)}
                                 disabled={somenteLeitura}
+                                style={{width: '486%'}}
                             />
                         </div>
                     </div>
+                <div style={{display: 'flex'}}>
+                    <button className={styles.retornar} type="button" onClick={handleClick}>Cancelar</button>
+                    {!somenteLeitura && (
+                        <button type="submit" id="add" className={styles.add}>
+                            {modoEdicao ? "Salvar Alterações" : "Confirmar Registro"}
+                        </button>
+                    )}
                 </div>
-
-                {!somenteLeitura && (
-                    <button type="submit" id="add" className={styles.add}>
-                        {modoEdicao ? "Salvar Alterações" : "Confirmar Registro"}
-                    </button>
-                )}
             </form>
         </>
     )
