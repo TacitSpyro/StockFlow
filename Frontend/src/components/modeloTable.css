@@ -5,6 +5,18 @@
   justify-content: space-between;
 }
 
+.botaoVE{
+  display: flex;
+  border: 'none';
+  background-color: 'transparent';
+  align-self: center;
+  justify-self: center;
+}
+
+.botaoVE:hover{
+  background-color: #b1b1b1;
+}
+
 .sdd{
 
   padding: 2px 5px 2px 5px;

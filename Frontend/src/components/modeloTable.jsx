@@ -4,6 +4,8 @@ import "./modeloTable.css"
 import Retornar from "../assets/Retornar.png"
 import { useNavigate } from "react-router-dom";
 import { useEmpresa } from "../context/EmpresaContext";
+import imagemVisualizar from "../assets/visualizar.png"
+import imagemEditar from "../assets/editar.png"
 
 const ENDPOINTS = {
     produto: (idEmpresa) => `http://localhost:8000/api/empresa/${idEmpresa}/produtos/`,
@@ -199,8 +201,11 @@ function TabelaBase({
                                             ))}
                                             {(urlEdicaoBase || urlVisualizacaoBase) && (
                                                 <td>
-                                                    <button type="button" onClick={() => irParaDetalhe(id)}>
-                                                        {edicao ? "Editar" : "Visualizar"}
+                                                    <button type="button" onClick={() => irParaDetalhe(id)} className="botaoVE">
+                                                        <img src={edicao ? imagemEditar : imagemVisualizar}
+                                                             alt={edicao ? "Editar" : "Visualizar"} 
+                                                             style={{width: '25px', border: 'none'}}
+                                                             />
                                                     </button>
                                                 </td>
                                             )}
