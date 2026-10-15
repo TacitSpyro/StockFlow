@@ -1,5 +1,69 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import retornar from "../assets/Retornar.png";
+import styles from "../styles/visualizar-relatorio.module.css"
+import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
+
+const COR = {
+    ativo: "#0ca30c",
+    inspecao: "#fab219",
+    bloqueio: "#d03b3b",
+    neutro: "#898781",
+};
+
+function formatarData(iso) {
+    if (!iso) return "...";
+    const [a, m, d] = iso.split("-");
+    return `${d}/${m}/${a}`;
+}
+
+function CardGrafico({ titulo, total, itens }) {
+    const dadosGrafico = total > 0
+        ? itens
+        : [{ nome: "Sem registros", valor: 1, cor: "#e5e7eb" }];
+
+    return (
+        <section className={styles.chartCard}>
+            <h2 className={styles.chartTitle}>{titulo}</h2>
+            <div className={styles.chartBody}>
+                <div className={styles.donut}>
+                    <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                            <Pie
+                                data={dadosGrafico}
+                                dataKey="valor"
+                                nameKey="nome"
+                                innerRadius="62%"
+                                outerRadius="100%"
+                                paddingAngle={total > 0 ? 2 : 0}
+                                stroke="none"
+                                isAnimationActive={false}
+                            >
+                                {dadosGrafico.map((i) => (
+                                    <Cell key={i.nome} fill={i.cor} />
+                                ))}
+                            </Pie>
+                        </PieChart>
+                    </ResponsiveContainer>
+                    <div className={styles.donutCenter}>
+                        <strong>{total}</strong>
+                        <span>total</span>
+                    </div>
+                </div>
+
+                <ul className={styles.legend}>
+                    {itens.map((i) => (
+                        <li key={i.nome}>
+                            <span className={styles.dot} style={{ background: i.cor }} />
+                            <span className={styles.legendNome}>{i.nome}</span>
+                            <strong>{i.valor}</strong>
+                        </li>
+                    ))}
+                </ul>
+            </div>
+        </section>
+    );
+}
 
 const TIPO_LABEL = {
     TODOS: "Todos",
@@ -35,42 +99,61 @@ function VisualizarRelatorio() {
     const { dados } = relatorio;
 
     return (
-        <main>
-            <label>Relatório — {TIPO_LABEL[relatorio.tipo] ?? relatorio.tipo}</label>
+        <>
+        <div className={styles.topbar}>
+            <img src={retornar} alt="retornar" className="navbar-img"/>
+            <a href="/visualizar-relatorios">Cancelar</a>
+        </div>
 
-            <p>Gerado em: {new Date(relatorio.data_geracao).toLocaleString("pt-BR")}</p>
-            <p>Gerado por: {relatorio.gerado_por ?? "—"}</p>
-            <p>
-                Período:{" "}
-                {relatorio.periodo_inicio || relatorio.periodo_fim
-                    ? `${relatorio.periodo_inicio ?? "..."} até ${relatorio.periodo_fim ?? "..."}`
-                    : "Sem filtro de data"}
-            </p>
+        <main className={styles.main}>
+            <div className={styles.card}>
+                <h1 className={styles.title}>
+                    Relatório — {TIPO_LABEL[relatorio.tipo] ?? relatorio.tipo}
+                </h1>
 
-            {dados.produtos && (
-                <section>
-                    <h3>Produtos</h3>
-                    <ul>
-                        <li>Total: {dados.produtos.total}</li>
-                        <li>Ativos: {dados.produtos.ativo}</li>
-                        <li>Em inspeção: {dados.produtos.inspecao}</li>
-                        <li>Bloqueados: {dados.produtos.bloqueio}</li>
-                        <li>Encerrados: {dados.produtos.encerrado}</li>
-                    </ul>
-                </section>
-            )}
+                <div className={styles.geracao}>
+                    <span className={styles.chip}>
+                        Gerado em: {new Date(relatorio.data_geracao).toLocaleString("pt-BR")}
+                    </span>
+                    <span className={styles.chip}>
+                        Gerado por: {relatorio.gerado_por ?? "—"}
+                    </span>
+                    <span className={styles.chip}>
+                        Período:{" "}
+                        {relatorio.periodo_inicio || relatorio.periodo_fim
+                            ? `${formatarData(relatorio.periodo_inicio)} até ${formatarData(relatorio.periodo_fim)}`
+                            : "Sem filtro de data"}
+                    </span>
+                </div>
 
-            {dados.fornecedores && (
-                <section>
-                    <h3>Fornecedores</h3>
-                    <ul>
-                        <li>Total: {dados.fornecedores.total}</li>
-                        <li>Ativos: {dados.fornecedores.ativos}</li>
-                        <li>Inativos: {dados.fornecedores.inativos}</li>
-                    </ul>
-                </section>
-            )}
+                <div className={styles.grid}>
+                    {dados.produtos && (
+                        <CardGrafico
+                            titulo="Produtos"
+                            total={dados.produtos.total}
+                            itens={[
+                                { nome: "Ativos", valor: dados.produtos.ativo, cor: COR.ativo },
+                                { nome: "Em inspeção", valor: dados.produtos.inspecao, cor: COR.inspecao },
+                                { nome: "Bloqueados", valor: dados.produtos.bloqueio, cor: COR.bloqueio },
+                                { nome: "Encerrados", valor: dados.produtos.encerrado, cor: COR.neutro },
+                            ]}
+                        />
+                    )}
+
+                    {dados.fornecedores && (
+                        <CardGrafico
+                            titulo="Fornecedores"
+                            total={dados.fornecedores.total}
+                            itens={[
+                                { nome: "Ativos", valor: dados.fornecedores.ativos, cor: COR.ativo },
+                                { nome: "Inativos", valor: dados.fornecedores.inativos, cor: COR.neutro },
+                            ]}
+                        />
+                    )}
+                </div>
+            </div>
         </main>
+    </>
     )
 }
 

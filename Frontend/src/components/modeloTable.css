@@ -103,6 +103,8 @@ tbody::before {
 table{
   border-collapse: separate !important;
   border-spacing: 8px 8px !important;
+  table-layout: auto;
+  width: 100%;
 }
 
 .Barraemcima{
