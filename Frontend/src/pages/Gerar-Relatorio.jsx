@@ -63,55 +63,74 @@ function GerarRelatorio() {
     }
 
     return (
-        <>
-            <div className={styles.topbar}>
-                <img src={retornar} alt="retornar" className="navbar-img"/>
-                <a href="/visualizar-relatorios">Cancelar</a>
-            </div>
-            <main>
-                <label>Gerar Relatório</label>
+    <>
+        <div className={styles.topbar}>
+            <img src={retornar} alt="retornar" className="navbar-img"/>
+            <a href="/visualizar-relatorios">Cancelar</a>
+        </div>
 
-                <form onSubmit={handleGerar}>
-                    <div>
-                        <label htmlFor="tipo">Tipo de Relatório</label>
-                        <Dropdown
-                            as="div"
-                            label={
-                                tipoSelecionado
-                                    ? tipos.find(t => t.value === tipoSelecionado)?.label
-                                    : "Selecione o tipo"
-                            }
-                            items={tipos}
-                            selected={tipoSelecionado}
-                            onSelect={setTipoSelecionado}
-                        />
+        <main className={styles.main}>
+            <div className={styles.card}>
+                <h1 className={styles.title}>Gerar Relatório</h1>
+
+                <form onSubmit={handleGerar} className={styles.form}>
+                    <div className={styles.field}>
+                        <label htmlFor="tipo" className={styles.label}>
+                            Tipo de Relatório
+                        </label>
+                        <div className={styles.dropdownWrapper}>
+                            <Dropdown
+                                as="div"
+                                label={
+                                    tipoSelecionado
+                                        ? tipos.find(t => t.value === tipoSelecionado)?.label
+                                        : "Selecione o tipo"
+                                }
+                                items={tipos}
+                                selected={tipoSelecionado}
+                                onSelect={setTipoSelecionado}
+                            />
+                        </div>
                     </div>
 
-                    <div>
-                        <label>Período (opcional)</label>
-                        <div style={{ display: "flex", gap: "8px" }}>
+                    <div className={styles.field}>
+                        <label className={styles.label}>
+                            Período <span className={styles.optional}>(opcional)</span>
+                        </label>
+                        <div className={styles.dateRange}>
                             <input
                                 type="date"
+                                className={styles.input}
                                 value={periodoInicio}
                                 onChange={(e) => setPeriodoInicio(e.target.value)}
                             />
-                            <span>até</span>
+                            <span className={styles.until}>até</span>
                             <input
                                 type="date"
+                                className={styles.input}
                                 value={periodoFim}
                                 onChange={(e) => setPeriodoFim(e.target.value)}
                             />
                         </div>
-                        <small>Deixe em branco para incluir todos os registros, sem filtro de data</small>
+                        <small className={styles.hint}>
+                            Deixe em branco para incluir todos os registros, sem filtro de data
+                        </small>
                     </div>
 
-                    <button type="submit" disabled={gerando}>
-                        {gerando ? "Gerando..." : "Gerar Relatório"}
-                    </button>
+                    <div className={styles.actions}>
+                        <button
+                            type="submit"
+                            className={styles.btnPrimary}
+                            disabled={gerando || !tipoSelecionado}
+                        >
+                            {gerando ? "Gerando..." : "Gerar Relatório"}
+                        </button>
+                    </div>
                 </form>
-            </main>
-        </>
-    )
+            </div>
+        </main>
+    </>
+)
 }
 
 export default GerarRelatorio;
