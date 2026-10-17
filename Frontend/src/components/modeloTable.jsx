@@ -7,6 +7,8 @@ import { useEmpresa } from "../context/EmpresaContext";
 import imagemVisualizar from "../assets/visualizar.png"
 import imagemEditar from "../assets/editar.png"
 
+const TAMANHO_PAGINA = 20;
+
 const ENDPOINTS = {
     produto: (idEmpresa) => `http://localhost:8000/api/empresa/${idEmpresa}/produtos/`,
     fornecedor: (idEmpresa) => `http://localhost:8000/api/empresa/${idEmpresa}/fornecedores/`,
@@ -87,6 +89,7 @@ function TabelaBase({
     urlEdicaoBase,
     urlVisualizacaoBase,
     colunas,
+    camposBusca,
     campoOrdenacao,
     campoNome = "nome_fantasia_fn",
     campoSituacao = "situacao",
@@ -97,6 +100,11 @@ function TabelaBase({
     function handleAcaoTopo(e) {
         e.preventDefault();
         navigate(urlDoCoiso);
+    }
+
+    function handleModo(valor) {
+        setModo(valor);
+        setPagina(1);
     }
 
     function irParaDetalhe(id) {
@@ -110,36 +118,96 @@ function TabelaBase({
     const [carregando, setCarregando] = useState(false);
     const [erro, setErro] = useState(null);
 
+    const [pagina, setPagina] = useState(1);
+    const [totalPaginas, setTotalPaginas] = useState(1);
+    const [total, setTotal] = useState(0);
+
+    const [campoBusca, setCampoBusca] = useState("todos");
+    const [textoBusca, setTextoBusca] = useState("");       // o que o usuário está digitando
+    const [buscaAplicada, setBuscaAplicada] = useState(""); // o que de fato vai pro servidor
+
+    const campoAtual = camposBusca?.find((c) => c.value === campoBusca);
+
+    // data e dropdown de opções aplicam na hora, sem debounce
+    function aplicarImediato(valor) {
+        setTextoBusca(valor);
+        setBuscaAplicada(valor);
+        setPagina(1);
+    }
+
+    function handleCampo(valor) {
+        setCampoBusca(valor);
+        setTextoBusca("");
+        setBuscaAplicada("");
+        setPagina(1);
+    }
+
+    function limparBusca() {
+        setTextoBusca("");
+        setBuscaAplicada("");
+        setPagina(1);
+    }
+
+    useEffect(() => {
+    if (campoAtual?.tipo === "data" || campoAtual?.tipo === "opcoes") return;
+
+    const t = setTimeout(() => {
+        setBuscaAplicada(textoBusca.trim());
+        setPagina(1); // resultado novo, volta pra primeira página
+    }, 400);
+
+        return () => clearTimeout(t);
+    }, [textoBusca, campoAtual]);
+
     // Busca os dados do backend
     useEffect(() => {
+
+        
+
         if (!idEmpresa || !tipo) return;
 
         const endpointFn = ENDPOINTS[tipo];
         if (!endpointFn) return;
 
+        let cancelado = false; // evita que uma resposta antiga sobrescreva uma mais nova
         setCarregando(true);
         setErro(null);
 
-        fetch(endpointFn(idEmpresa))
+        const params = new URLSearchParams({
+            pagina,
+            tamanho: TAMANHO_PAGINA,
+            ordenar: modo,
+        });
+
+        if (buscaAplicada) {
+            params.set("busca", buscaAplicada);
+            params.set("campo", campoBusca);
+        }
+
+        fetch(`${endpointFn(idEmpresa)}?${params}`)
             .then((res) => {
                 if (!res.ok) throw new Error("Erro ao buscar dados");
                 return res.json();
             })
-            .then((data) => setLinhas(data))
+            .then((data) => {
+                if (cancelado) return;
+                setLinhas(data.resultados);
+                setTotal(data.total);
+                setTotalPaginas(data.total_paginas);
+            })
             .catch((err) => {
+                if (cancelado) return;
                 console.error(err);
                 setErro("Não foi possível carregar os dados");
                 setLinhas([]);
             })
-            .finally(() => setCarregando(false));
+            .finally(() => {
+                if (!cancelado) setCarregando(false);
+            });
 
-    }, [tipo, idEmpresa]);
+        return () => { cancelado = true; };
 
-    const linhasOrdenadas = ordenarLinhas(linhas, modo, {
-        campoData: campoOrdenacao,
-        campoNome,
-        campoSituacao,
-    });
+    }, [tipo, idEmpresa, pagina, modo, buscaAplicada, campoBusca]);
 
     return (
         <>
@@ -170,51 +238,109 @@ function TabelaBase({
                     </div>
                 </div>
 
+                {camposBusca && (
+                    <div className="barraBusca">
+                        <Dropdown
+                            as="div"
+                            label={campoAtual?.label ?? "Campo"}
+                            items={camposBusca}
+                            selected={campoBusca}
+                            onSelect={handleCampo}
+                        />
+
+                        {campoAtual?.tipo === "opcoes" ? (
+                            <Dropdown
+                                as="div"
+                                label="Selecione..."
+                                items={campoAtual.opcoes}
+                                selected={buscaAplicada || null}
+                                onSelect={aplicarImediato}
+                            />
+                        ) : campoAtual?.tipo === "data" ? (
+                            <input
+                                type="date"
+                                value={textoBusca}
+                                onChange={(e) => aplicarImediato(e.target.value)}
+                            />
+                        ) : (
+                            <input
+                                type="text"
+                                placeholder="Pesquisar..."
+                                value={textoBusca}
+                                onChange={(e) => setTextoBusca(e.target.value)}
+                            />
+                        )}
+
+                        {buscaAplicada && (
+                            <button type="button" onClick={limparBusca}>Limpar</button>
+                        )}
+                    </div>
+                )}
                 
                 {carregando && <p>Carregando...</p>}
                 {erro && <p>{erro}</p>}
 
                 {!carregando && !erro && (
-                    <table>
-                        <thead>
-                            <tr>
-                                {colunas.map((col) => (
-                                    <th key={col.key}>{col.label}</th>
-                                ))}
-                                {(urlEdicaoBase || urlVisualizacaoBase) && <th>Ações</th>}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {linhasOrdenadas.length === 0 ? (
+                    <>
+                        <table>
+                            <thead>
                                 <tr>
-                                    <td colSpan={colunas.length + 1}>Nenhum registro encontrado</td>
+                                    {colunas.map((col) => (
+                                        <th key={col.key}>{col.label}</th>
+                                    ))}
+                                    {(urlEdicaoBase || urlVisualizacaoBase) && <th>Ações</th>}
                                 </tr>
-                            ) : (
-                                linhasOrdenadas.map((linha, i) => {
-                                    const id = linha.id ?? linha.id_fornecedor ?? i;
-                                    return (
-                                        <tr key={id}>
-                                            {colunas.map((col) => (
-                                                <td key={col.key}>
-                                                    {col.format ? col.format(linha[col.key], linha) : String(linha[col.key] ?? "")}
-                                                </td>
-                                            ))}
-                                            {(urlEdicaoBase || urlVisualizacaoBase) && (
-                                                <td>
-                                                    <button type="button" onClick={() => irParaDetalhe(id)} className="botaoVE">
-                                                        <img src={edicao ? imagemEditar : imagemVisualizar}
-                                                             alt={edicao ? "Editar" : "Visualizar"} 
-                                                             style={{width: '25px', border: 'none'}}
-                                                             />
-                                                    </button>
-                                                </td>
-                                            )}
-                                        </tr>
-                                    );
-                                })
-                            )}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {linhas.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={colunas.length + 1}>
+                                            {buscaAplicada ? "Nenhum resultado para a busca" : "Nenhum registro encontrado"}
+                                        </td>
+                                    </tr>
+                                ) : (
+                                    linhas.map((linha, i) => {
+                                        const id = linha.id ?? linha.id_fornecedor ?? i;
+                                        return (
+                                            <tr key={id}>
+                                                {colunas.map((col) => (
+                                                    <td key={col.key}>
+                                                        {col.format ? col.format(linha[col.key], linha) : String(linha[col.key] ?? "")}
+                                                    </td>
+                                                ))}
+                                                {(urlEdicaoBase || urlVisualizacaoBase) && (
+                                                    <td>
+                                                        <button type="button" onClick={() => irParaDetalhe(id)}>
+                                                            {edicao ? "Editar" : "Visualizar"}
+                                                        </button>
+                                                    </td>
+                                                )}
+                                            </tr>
+                                        );
+                                    })
+                                )}
+                            </tbody>
+                        </table>
+                        <div className="paginacao">
+                            <button
+                                type="button"
+                                onClick={() => setPagina((p) => p - 1)}
+                                disabled={pagina <= 1}
+                            >
+                                Anterior
+                            </button>
+
+                            <span>Página {pagina} de {totalPaginas} ({total} registros)</span>
+
+                            <button
+                                type="button"
+                                onClick={() => setPagina((p) => p + 1)}
+                                disabled={pagina >= totalPaginas}
+                            >
+                                Próxima
+                            </button>
+                        </div>
+                    </>
                 )}
             </main>
         </>

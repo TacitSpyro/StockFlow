@@ -7,9 +7,31 @@ from .serializers import FornecedorSerializer
 from app_empresas.models import Empresa
 from app_admin.models import Admin
 
+from Backend.paginacao import paginar
 import requests
 from django.http import JsonResponse
+from Backend.busca import filtrar
 
+BUSCA_FORNECEDOR = dict(
+    campos_texto={
+        "nome": ["nome_fantasia_fn", "razao_social_fn"],
+        "cnpj": ["cnpj_fn"],
+        "cidade": ["cidade", "uf"],
+        "responsavel": ["nome_responsavel"],
+        "email": ["email_fn"],
+    },
+    campos_data={"data": "data_cadastro__date"},
+    campos_exatos={"ativo": "ativo"},
+)
+
+def ordenar_fornecedores(qs, modo):
+    if modo == "antigo":
+        return qs.order_by("data_cadastro", "id_fornecedor")
+    if modo == "alfabetico":
+        return qs.order_by("nome_fantasia_fn", "id_fornecedor")
+    if modo == "estado":
+        return qs.order_by("-ativo", "nome_fantasia_fn", "id_fornecedor")
+    return qs.order_by("-data_cadastro", "-id_fornecedor")
 
 def consultar_cep(request, cep):
     cep_limpo = "".join(filter(str.isdigit, cep))
@@ -37,8 +59,9 @@ def consultar_cep(request, cep):
 @api_view(['GET'])
 def listar_fornecedores(request, id_empresa):
     fornecedores = Fornecedor.objects.filter(empresa_id=id_empresa)
-    serializer = FornecedorSerializer(fornecedores, many=True)
-    return Response(serializer.data)
+    fornecedores = filtrar(request, fornecedores, **BUSCA_FORNECEDOR)   # <- novo
+    fornecedores = ordenar_fornecedores(fornecedores, request.GET.get("ordenar"))
+    return paginar(request, fornecedores, lambda objs: FornecedorSerializer(objs, many=True).data)
 
 @api_view(['GET'])
 def catalogo_do_fornecedor(request, id_fornecedor):
