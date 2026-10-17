@@ -6,12 +6,47 @@ from django.utils import timezone
 from app_empresas.models import Empresa
 from app_fornecedores.models import Fornecedor
 from app_admin.models import Admin
+from django.db.models import Case, When, Value, IntegerField
+from Backend.paginacao import paginar
+
+from Backend.busca import filtrar
+
+BUSCA_PRODUTO = dict(
+    campos_texto={
+        "nome": ["catalogo__nome"],
+        "lote": ["lote"],
+        "fornecedor": ["fornecedor__nome_fantasia_fn", "fornecedor__razao_social_fn"],
+        "localizacao": ["ala", "secao", "prateleira"],
+    },
+    campos_data={"data": "data_fabricacao"},
+    campos_exatos={"situacao": "situacao"},
+)
+
+def ordenar_produtos(qs, modo):
+    if modo == "antigo":
+        return qs.order_by("data_fabricacao", "id")
+    if modo == "alfabetico":
+        return qs.order_by("catalogo__nome", "id")
+    if modo == "estado":  # ativos primeiro, depois as outras situações agrupadas
+        return qs.annotate(
+            prioridade=Case(
+                When(situacao="ATIVO", then=Value(0)),
+                default=Value(1),
+                output_field=IntegerField(),
+            )
+        ).order_by("prioridade", "situacao", "catalogo__nome", "id")
+    return qs.order_by("-data_fabricacao", "-id")  # "recente" e padrão
 
 @api_view(['GET'])
 def listar_produtos(request, id_empresa):
-    produtos = Produto.objects.filter(empresa_id=id_empresa)
-    serializer = ProdutoSerializer(produtos, many=True)
-    return Response(serializer.data)
+    produtos = (
+        Produto.objects
+        .filter(empresa_id=id_empresa)
+        .select_related("catalogo", "fornecedor")
+    )
+    produtos = filtrar(request, produtos, **BUSCA_PRODUTO)   # <- novo
+    produtos = ordenar_produtos(produtos, request.GET.get("ordenar"))
+    return paginar(request, produtos, lambda objs: ProdutoSerializer(objs, many=True).data)
 
 @api_view(['GET'])
 def listar_catalogo(request, id_empresa):

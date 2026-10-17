@@ -5,7 +5,8 @@ from rest_framework.response import Response
 from .models import Relatorio
 from app_produtos.models import Produto
 from app_fornecedores.models import Fornecedor
-
+from Backend.paginacao import paginar
+from Backend.busca import filtrar
 
 def montar_dados_produtos(produtos):
     return {
@@ -84,25 +85,39 @@ def gerar_relatorio(request):
 
 @api_view(['GET'])
 def listar_relatorios(request, id_empresa):
-    tipo = request.GET.get("tipo")  # filtro opcional por tipo
+    tipo = request.GET.get("tipo")
 
-    relatorios = Relatorio.objects.filter(empresa_id=id_empresa)
+    relatorios = Relatorio.objects.filter(empresa_id=id_empresa).select_related("gerado_por")
     if tipo:
         relatorios = relatorios.filter(tipo=tipo)
 
-    data = [
-        {
-            "id": r.id,
-            "tipo": r.tipo,
-            "data_geracao": r.data_geracao,
-            "periodo_inicio": r.periodo_inicio,
-            "periodo_fim": r.periodo_fim,
-            "dados": r.dados,
-            "gerado_por": r.gerado_por.nome_admin if r.gerado_por else None,
-        }
-        for r in relatorios
-    ]
-    return Response(data)
+    relatorios = filtrar(
+        request, relatorios,
+        campos_texto={"gerado_por": ["gerado_por__nome_admin"]},
+        campos_data={"data": "data_geracao__date"},
+        campos_exatos={"tipo": "tipo"},
+    )
+
+    if request.GET.get("ordenar") == "antigo":
+        relatorios = relatorios.order_by("data_geracao", "id")
+    else:
+        relatorios = relatorios.order_by("-data_geracao", "-id")
+
+    def serializar(objs):
+        return [
+            {
+                "id": r.id,
+                "tipo": r.tipo,
+                "data_geracao": r.data_geracao,
+                "periodo_inicio": r.periodo_inicio,
+                "periodo_fim": r.periodo_fim,
+                "dados": r.dados,
+                "gerado_por": r.gerado_por.nome_admin if r.gerado_por else None,
+            }
+            for r in objs
+        ]
+
+    return paginar(request, relatorios, serializar)
 
 @api_view(['GET'])
 def obter_relatorio(request, id_relatorio):

@@ -40,6 +40,18 @@ function TabelaRelatorios() {
                 { key: "gerado_por", label: "Gerado Por" },
             ]}
             campoOrdenacao="data_geracao"
+            camposBusca={[
+                { value: "gerado_por", label: "Gerado por" },
+                { value: "data", label: "Data", tipo: "data" },
+                {
+                    value: "tipo", label: "Tipo", tipo: "opcoes",
+                    opcoes: [
+                        { value: "TODOS", label: "Todos" },
+                        { value: "PRODUTO", label: "Produtos" },
+                        { value: "FORNECEDOR", label: "Fornecedores" },
+                    ],
+                },
+            ]}
         />
     )
 }
