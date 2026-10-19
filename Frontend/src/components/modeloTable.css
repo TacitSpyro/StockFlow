@@ -111,3 +111,21 @@ table{
   display: flex;
   justify-content: space-between;
 }
+
+.paginacao{
+  display: flex;
+
+}
+
+.paginacao button{
+  display: flex;
+  width: 40px;
+  height: 40px;
+}
+
+.paginacao img{
+  justify-self: center;
+  align-self: center;
+  width: 30px;
+  height: 30px;
+}

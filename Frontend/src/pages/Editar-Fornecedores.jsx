@@ -31,6 +31,22 @@ function TabelaFornecedores() {
                     format: (valor) => (valor ? "Ativo" : "Inativo"),
                 },
             ]}
+            camposBusca={[
+                { value: "todos", label: "Todos os campos" },
+                { value: "nome", label: "Nome" },
+                { value: "cnpj", label: "CNPJ" },
+                { value: "cidade", label: "Cidade / UF" },
+                { value: "responsavel", label: "Responsável" },
+                { value: "email", label: "E-mail" },
+                { value: "data", label: "Data de cadastro", tipo: "data" },
+                {
+                    value: "ativo", label: "Situação", tipo: "opcoes",
+                    opcoes: [
+                        { value: "1", label: "Ativo" },
+                        { value: "0", label: "Inativo" },
+                    ],
+                },
+            ]}
             campoOrdenacao="data_cadastro"
             campoNome="nome"
             campoSituacao="situacao"

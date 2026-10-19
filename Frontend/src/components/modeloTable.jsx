@@ -6,6 +6,8 @@ import { useNavigate } from "react-router-dom";
 import { useEmpresa } from "../context/EmpresaContext";
 import imagemVisualizar from "../assets/visualizar.png"
 import imagemEditar from "../assets/editar.png"
+import rolarE from "../assets/rolarE.png"
+import rolarD from "../assets/rolarD.png"
 
 const TAMANHO_PAGINA = 20;
 
@@ -327,7 +329,7 @@ function TabelaBase({
                                 onClick={() => setPagina((p) => p - 1)}
                                 disabled={pagina <= 1}
                             >
-                                Anterior
+                                <img src={rolarE} />
                             </button>
 
                             <span>Página {pagina} de {totalPaginas} ({total} registros)</span>
@@ -337,7 +339,7 @@ function TabelaBase({
                                 onClick={() => setPagina((p) => p + 1)}
                                 disabled={pagina >= totalPaginas}
                             >
-                                Próxima
+                                <img src={rolarD} style={{marginRight: '0px'}}/>
                             </button>
                         </div>
                     </>
