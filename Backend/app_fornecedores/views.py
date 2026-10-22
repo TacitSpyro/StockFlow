@@ -6,6 +6,8 @@ from .models import Fornecedor
 from .serializers import FornecedorSerializer
 from app_empresas.models import Empresa
 from app_admin.models import Admin
+from django.utils import timezone
+from .cnpj_service import limpar_cnpj, validar_cnpj, consultar_cnpj
 
 from Backend.paginacao import paginar
 import requests
@@ -114,9 +116,15 @@ def criar_fornecedor(request):
         return Response({"erro": "Telefone inválido. Use DDD + número (10 ou 11 dígitos)"}, status=400)
 
     # Limpa e valida CNPJ
-    cnpj_limpo = limpar_numeros(dados["cnpj_fn"])
-    if not validar_cnpj_formato(cnpj_limpo):
-        return Response({"erro": "CNPJ inválido. Deve conter 14 dígitos"}, status=400)
+    cnpj_limpo = limpar_cnpj(dados["cnpj_fn"])
+    if not validar_cnpj(cnpj_limpo):
+        return Response({"erro": "CNPJ inválido (formato ou dígito verificador)"}, status=400)
+
+    # duplicidade só dentro da MESMA empresa
+    if Fornecedor.objects.filter(cnpj_fn=cnpj_limpo, empresa=empresa).exists():
+        return Response({"erro": "Já existe um fornecedor com esse CNPJ nesta empresa"}, status=400)
+
+    consulta = consultar_cnpj(cnpj_limpo)
 
     # Confere duplicidade de CNPJ (já que é unique no model)
     if Fornecedor.objects.filter(cnpj_fn=cnpj_limpo).exists():
@@ -144,7 +152,9 @@ def criar_fornecedor(request):
         empresa=empresa,
         razao_social_fn=dados["razao_social_fn"],
         nome_fantasia_fn=dados["nome_fantasia_fn"],
-        cnpj_fn=cnpj_formatado,
+        cnpj_fn=cnpj_limpo,  # salva LIMPO; formate só na exibição
+        situacao_cadastral=consulta["situacao_cadastral"],
+        data_consulta_cnpj=timezone.now(),
         cep=cep_formatado,
         logradouro=dados.get("logradouro", ""),
         bairro=dados.get("bairro", ""),
@@ -162,11 +172,11 @@ def criar_fornecedor(request):
     if ids_produtos:
         fornecedor.produtos.set(ids_produtos)
 
-    return Response({"id_fornecedor": fornecedor.id_fornecedor})
-
     return Response({
         "id_fornecedor": fornecedor.id_fornecedor,
         "nome_fantasia_fn": fornecedor.nome_fantasia_fn,
+        "situacao_cadastral": fornecedor.situacao_cadastral,
+        "elegivel_legalmente": fornecedor.elegivel_legalmente,
     }, status=201)
 
 @api_view(['GET'])
@@ -183,7 +193,10 @@ def obter_fornecedor(request, id_fornecedor):
         "id_fornecedor": fornecedor.id_fornecedor,
         "razao_social_fn": fornecedor.razao_social_fn,
         "nome_fantasia_fn": fornecedor.nome_fantasia_fn,
+        "situacao_cadastral": fornecedor.situacao_cadastral,
+        "data_consulta_cnpj": fornecedor.data_consulta_cnpj,
         "cnpj_fn": fornecedor.cnpj_fn,
+        "cnpj_formatado": fornecedor.cnpj_formatado,
         "cep": fornecedor.cep,
         "logradouro": fornecedor.logradouro,
         "bairro": fornecedor.bairro,
@@ -215,7 +228,18 @@ def atualizar_fornecedor(request, id_fornecedor):
 
     fornecedor.razao_social_fn = dados.get("razao_social_fn", fornecedor.razao_social_fn)
     fornecedor.nome_fantasia_fn = dados.get("nome_fantasia_fn", fornecedor.nome_fantasia_fn)
-    fornecedor.cnpj_fn = dados.get("cnpj_fn", fornecedor.cnpj_fn)
+
+    novo_cnpj = limpar_cnpj(dados.get("cnpj_fn", fornecedor.cnpj_fn))
+    if novo_cnpj != limpar_cnpj(fornecedor.cnpj_fn):
+        if not validar_cnpj(novo_cnpj):
+            return Response({"erro": "CNPJ inválido"}, status=400)
+        if Fornecedor.objects.filter(cnpj_fn=novo_cnpj, empresa=fornecedor.empresa).exclude(pk=fornecedor.pk).exists():
+            return Response({"erro": "Já existe um fornecedor com esse CNPJ nesta empresa"}, status=400)
+        consulta = consultar_cnpj(novo_cnpj)
+        fornecedor.situacao_cadastral = consulta["situacao_cadastral"]
+        fornecedor.data_consulta_cnpj = timezone.now()
+    fornecedor.cnpj_fn = novo_cnpj
+    
     fornecedor.cep = dados.get("cep", fornecedor.cep)
     fornecedor.logradouro = dados.get("logradouro", fornecedor.logradouro)
     fornecedor.bairro = dados.get("bairro", fornecedor.bairro)
