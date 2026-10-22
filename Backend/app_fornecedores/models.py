@@ -1,5 +1,7 @@
 from django.db import models
 
+import re
+
 #Importando as 3 relações dessa tabela
 from app_admin.models import Admin
 from app_empresas.models import Empresa
@@ -69,6 +71,12 @@ class Fornecedor(models.Model):
     def elegivel_legalmente(self):
         return self.situacao_cadastral == "ATIVA"
 
+    @property
+    def cnpj_formatado(self):
+        c = re.sub(r"[^0-9A-Za-z]", "", self.cnpj_fn or "").upper()
+        if len(c) != 14:
+            return self.cnpj_fn  # valor estranho: devolve como está, sem quebrar
+        return f"{c[:2]}.{c[2:5]}.{c[5:8]}/{c[8:12]}-{c[12:]}"
 #Formata o endereço quando alguem consultar
     @property
     def endereco_completo(self):

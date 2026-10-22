@@ -16,7 +16,7 @@ function CadastrarFornecedor() {
     const precisaCarregarDados = modoEdicao || somenteLeitura;
 
     const handleClick = () => {
-         navigate('/edição/fornecedores');
+         navigate('/tabela-fornecedores');
     }
 
     const [form, setForm] = useState({
@@ -39,6 +39,9 @@ function CadastrarFornecedor() {
     const [catalogo, setCatalogo] = useState([]);
     const [produtosSelecionados, setProdutosSelecionados] = useState([]);
     const [buscaProduto, setBuscaProduto] = useState("");
+
+    const [situacaoCadastral, setSituacaoCadastral] = useState("");
+    const [dataConsultaCnpj, setDataConsultaCnpj] = useState(null);
 
     const [carregandoFornecedor, setCarregandoFornecedor] = useState(precisaCarregarDados);
 
@@ -70,7 +73,7 @@ function CadastrarFornecedor() {
                 setForm({
                     razao_social_fn: data.razao_social_fn || "",
                     nome_fantasia_fn: data.nome_fantasia_fn || "",
-                    cnpj_fn: data.cnpj_fn || "",
+                    cnpj_fn: data.cnpj_formatado || "",
                     cep: data.cep || "",
                     logradouro: data.logradouro || "",
                     bairro: data.bairro || "",
@@ -84,6 +87,8 @@ function CadastrarFornecedor() {
                     ativo: data.ativo,
                 });
                 setProdutosSelecionados(data.produtos_info || []);
+                setSituacaoCadastral(data.situacao_cadastral || "");
+                setDataConsultaCnpj(data.data_consulta_cnpj || null);
             })
             .catch((err) => {
                 console.error(err);
@@ -227,7 +232,7 @@ function CadastrarFornecedor() {
 
             <div className={styles.topbar}>
                 <img src={retornar} alt="retornar" className="navbar-img"/>
-                <a href="/edição/fornecedores">{somenteLeitura ? "Voltar" : "Retornar"}</a>
+                <a href="/tabela-fornecedores">{somenteLeitura ? "Voltar" : "Retornar"}</a>
             </div>
 
             <main className={styles.main}>
@@ -250,7 +255,7 @@ function CadastrarFornecedor() {
                     <div className={styles.secao1}>
                         <label>Dados da empresa</label>
                         <div className={styles.coluna1}>
-                            <div className={styles.concatenar}>
+                            <div className={styles.concatenar} style={{marginRight: '24%'}}>
                                 <label>Razão Social</label>
                                 <input
                                     className={styles.razao}
@@ -261,10 +266,10 @@ function CadastrarFornecedor() {
                                     disabled={somenteLeitura}
                                 />
                             </div>
-                            <div className={styles.concatenar}>
+                            <div className={styles.concatenar} style={{marginRight: '16%'}}>
                                 <label>Nome Fantasia</label>
                                 <input
-                                className={styles.nomeF}
+                                    className={styles.nomeF}
                                     type="text"
                                     placeholder="Nome Fantasia"
                                     value={form.nome_fantasia_fn}
@@ -272,7 +277,7 @@ function CadastrarFornecedor() {
                                     disabled={somenteLeitura}
                                 />
                             </div>
-                            <div className={styles.concatenar}>
+                            <div className={styles.concatenar} style={{marginRight: '3%'}}>
                                 <label>CNPJ</label>
                                 <input
                                     type="text"
@@ -280,8 +285,25 @@ function CadastrarFornecedor() {
                                     value={form.cnpj_fn}
                                     onChange={(e) => atualizarCampo("cnpj_fn", e.target.value)}
                                     disabled={somenteLeitura}
+                                    style={{width: '78%'}}
                                 />
                             </div>
+                            {somenteLeitura && (
+                                <div className={styles.concatenar}>
+                                    <label>Situação cadastral (Receita Federal)</label>
+                                    <input
+                                        type="text"
+                                        value={situacaoCadastral || "Sem consulta"}
+                                        disabled={somenteLeitura}
+                                        style={{margin: '0'}}
+                                    />
+                                    {dataConsultaCnpj && (
+                                        <small>
+                                            Consultado em {new Date(dataConsultaCnpj).toLocaleString("pt-BR")}
+                                        </small>
+                                    )}
+                                </div>
+                            )}
                         </div>
                         <div className={styles.coluna2}>
                             <label>Endereço</label>
