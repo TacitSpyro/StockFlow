@@ -32,7 +32,11 @@ class Fornecedor(models.Model):
 
     razao_social_fn = models.CharField(max_length=150)
     nome_fantasia_fn = models.CharField(max_length=150)
-    cnpj_fn = models.CharField(max_length=18, unique=True)
+
+    cnpj_fn = models.CharField(max_length=18)  # guardar só caracteres puros (14), formatar na exibição
+
+    situacao_cadastral = models.CharField(max_length=30, blank=True)  # ex: "ATIVA", "INAPTA", "BAIXADA"
+    data_consulta_cnpj = models.DateTimeField(null=True, blank=True)
 
     # Endereço via CEP, calcula o CEP na Views com ViaCEP
 
@@ -59,6 +63,11 @@ class Fornecedor(models.Model):
 
     class Meta:
         db_table = "fornecedor"
+        unique_together = ("cnpj_fn", "empresa")
+
+    @property
+    def elegivel_legalmente(self):
+        return self.situacao_cadastral == "ATIVA"
 
 #Formata o endereço quando alguem consultar
     @property
