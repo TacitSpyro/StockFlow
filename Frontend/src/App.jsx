@@ -11,6 +11,8 @@ import AdicionarLote from "./pages/Adicionar-Lote"
 import EdicaoProdutos from "./pages/Editar-Estoque"
 import GerarRelatorio from "./pages/Gerar-Relatorio"
 import VisualizarRelatorio from "./pages/visualizar_relatorio";
+import EdicaoPedidos from "./pages/Editar-pedidos";
+import TabelaPedidos from "./pages/Tabela-pedidos";
 
 function App() {
   return (
@@ -33,6 +35,8 @@ function App() {
           <Route path="/visualizar-lote/:id" element={<AdicionarLote />} />
           <Route path="/visualizar-fornecedor/:id" element={<AdicionarFornecedor />} />
           <Route path="/visualizar-relatorio/:id" element={<VisualizarRelatorio />} />
+          <Route path="/tabela-pedidos" element={<TabelaPedidos />} />
+          <Route path="/edição-pedidos" element={<EdicaoPedidos />} />
         </Routes>
       </BrowserRouter>
     </EmpresaProvider>

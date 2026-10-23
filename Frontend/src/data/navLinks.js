@@ -1,3 +1,5 @@
+import { href } from "react-router-dom";
+
 export const homeLinks = [
   {
     label: "Ferramentas de analise",
@@ -5,6 +7,7 @@ export const homeLinks = [
       { href: "/visualizar-relatorios", label: "Relatórios" },
       { href: "/tabela-produtos", label: "Produtos" },
       { href: "/tabela-fornecedores", label: "Fornecedores" },
+      { href: "/tabela-pedidos", label: "Pedidos" },
     ],
   },
   {
@@ -12,6 +15,7 @@ export const homeLinks = [
     items: [
       { href: "/edição/produtos", label: "Editar estoque" },
       { href: "/edição/fornecedores", label: "Editar Fornecimento" },
+      { href: "/edição-pedidos", label: "Abrir pedidos" },
     ],
   },
 ];

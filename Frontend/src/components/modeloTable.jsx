@@ -13,6 +13,7 @@ const ENDPOINTS = {
     produto: (idEmpresa) => `http://localhost:8000/api/empresa/${idEmpresa}/produtos/`,
     fornecedor: (idEmpresa) => `http://localhost:8000/api/empresa/${idEmpresa}/fornecedores/`,
     relatorio: (idEmpresa) => `http://localhost:8000/api/empresa/${idEmpresa}/relatorios/`,
+    pedido: (idEmpresa) => `http://localhost:8000/api/empresa/${idEmpresa}/pedidos/`,
 };
 
 const collator = new Intl.Collator("pt-BR", { sensitivity: "base" });
