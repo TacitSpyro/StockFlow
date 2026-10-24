@@ -13,6 +13,8 @@ import GerarRelatorio from "./pages/Gerar-Relatorio"
 import VisualizarRelatorio from "./pages/visualizar_relatorio";
 import EdicaoPedidos from "./pages/Editar-pedidos";
 import TabelaPedidos from "./pages/Tabela-pedidos";
+import CadastrarPedido from "./pages/abir-pedido";
+import FecharPedido from "./pages/Fechar-pedido";
 
 function App() {
   return (
@@ -37,6 +39,10 @@ function App() {
           <Route path="/visualizar-relatorio/:id" element={<VisualizarRelatorio />} />
           <Route path="/tabela-pedidos" element={<TabelaPedidos />} />
           <Route path="/edição-pedidos" element={<EdicaoPedidos />} />
+          <Route path="/adicionar-pedido" element={<CadastrarPedido />} />      
+          <Route path="/adicionar-pedido/:id" element={<CadastrarPedido />} />
+          <Route path="/visualizar-pedido/:id" element={<CadastrarPedido />} /> 
+          <Route path="/fechar-pedido/:id" element={<FecharPedido />} />
         </Routes>
       </BrowserRouter>
     </EmpresaProvider>
