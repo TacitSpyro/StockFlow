@@ -38,6 +38,9 @@ class Fornecedor(models.Model):
     cnpj_fn = models.CharField(max_length=18)  # guardar só caracteres puros (14), formatar na exibição
 
     situacao_cadastral = models.CharField(max_length=30, blank=True)  # ex: "ATIVA", "INAPTA", "BAIXADA"
+    data_abertura = models.DateField(null=True, blank=True)
+    porte = models.CharField(max_length=30, blank=True)
+    capital_social = models.DecimalField(max_digits=16, decimal_places=2, null=True, blank=True)
     data_consulta_cnpj = models.DateTimeField(null=True, blank=True)
 
     # Endereço via CEP, calcula o CEP na Views com ViaCEP

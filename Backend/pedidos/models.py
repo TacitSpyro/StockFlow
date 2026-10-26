@@ -34,7 +34,7 @@ class PedidoCompra(models.Model):
     status = models.CharField(max_length=10, choices=Status.choices, default=Status.ABERTO)
 
     # ---------- PARTE 1: abertura ----------
-    data_pedido = models.DateTimeField(auto_now_add=True)
+    data_pedido = models.DateTimeField(default=timezone.now)
     data_entrega_prevista = models.DateField()
     prazo_pagamento_dias = models.PositiveIntegerField(default=0)  # 0 = à vista (numérico, pro Prophet)
     tipo_frete = models.CharField(max_length=3, choices=Frete.choices, default=Frete.CIF)
