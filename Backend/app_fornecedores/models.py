@@ -1,5 +1,7 @@
 from django.db import models
 
+from django.utils import timezone
+
 import re
 
 #Importando as 3 relações dessa tabela
@@ -85,6 +87,14 @@ class Fornecedor(models.Model):
     def endereco_completo(self):
         partes = [self.logradouro, self.numero, self.complemento, self.bairro, self.cidade, self.uf]
         return ", ".join(p for p in partes if p)
+
+    @property
+    def idade_anos(self):
+        if not self.data_abertura:
+            return None
+        hoje = timezone.localdate()
+        passou = (hoje.month, hoje.day) >= (self.data_abertura.month, self.data_abertura.day)
+        return hoje.year - self.data_abertura.year - (0 if passou else 1)
 
     def __str__(self):
         return self.nome_fantasia_fn

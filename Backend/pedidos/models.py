@@ -7,6 +7,16 @@ from app_empresas.models import Empresa
 from app_admin.models import Admin
 from app_produtos.models import CatalogoProduto
 
+class IndiceEconomico(models.Model):
+    nome = models.CharField(max_length=30)             # "IPCA", "IGPM", "DOLAR"
+    data = models.DateField()                          # primeiro dia do mês
+    valor = models.DecimalField(max_digits=14, decimal_places=6)
+
+    class Meta:
+        db_table = "indice_economico"
+        unique_together = ("nome", "data")
+        ordering = ["nome", "data"]
+
 
 class PedidoCompra(models.Model):
 
@@ -117,7 +127,7 @@ class PedidoCompra(models.Model):
                 item.quantidade_avariada = avariada
                 item.categoria_avaria = dados.get("categoria_avaria", "") if avariada else ""
                 item.descricao_avaria = dados.get("descricao_avaria", "")
-                item.preco_unitario_final = dados["preco_unitario_final"]
+                item.preco_unitario_final = Decimal(str(dados["preco_unitario_final"]))
                 item.save()
 
             self.data_recebimento = data_recebimento

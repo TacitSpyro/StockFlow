@@ -124,16 +124,12 @@ def criar_fornecedor(request):
     if Fornecedor.objects.filter(cnpj_fn=cnpj_limpo, empresa=empresa).exists():
         return Response({"erro": "Já existe um fornecedor com esse CNPJ nesta empresa"}, status=400)
 
-    consulta = consultar_cnpj(cnpj_limpo)
-
-    # Confere duplicidade de CNPJ (já que é unique no model)
-    if Fornecedor.objects.filter(cnpj_fn=cnpj_limpo).exists():
-        return Response({"erro": "Já existe um fornecedor com esse CNPJ"}, status=400)
-
     # Limpa CEP também
     cep_limpo = limpar_numeros(dados["cep"])
     if len(cep_limpo) != 8:
         return Response({"erro": "CEP inválido. Deve conter 8 dígitos"}, status=400)
+
+    consulta = consultar_cnpj(cnpj_limpo)
 
     # Formata de volta pro padrão do banco
     telefone_formatado = (
@@ -141,7 +137,6 @@ def criar_fornecedor(request):
         if len(telefone_limpo) == 11
         else f"({telefone_limpo[:2]}) {telefone_limpo[2:6]}-{telefone_limpo[6:]}"
     )
-    cnpj_formatado = f"{cnpj_limpo[:2]}.{cnpj_limpo[2:5]}.{cnpj_limpo[5:8]}/{cnpj_limpo[8:12]}-{cnpj_limpo[12:]}"
     cep_formatado = f"{cep_limpo[:5]}-{cep_limpo[5:]}"
 
     admin = None
@@ -155,6 +150,9 @@ def criar_fornecedor(request):
         cnpj_fn=cnpj_limpo,  # salva LIMPO; formate só na exibição
         situacao_cadastral=consulta["situacao_cadastral"],
         data_consulta_cnpj=timezone.now(),
+        data_abertura=consulta["data_abertura"],
+        porte=consulta["porte"],
+        capital_social=consulta["capital_social"],
         cep=cep_formatado,
         logradouro=dados.get("logradouro", ""),
         bairro=dados.get("bairro", ""),
@@ -238,6 +236,9 @@ def atualizar_fornecedor(request, id_fornecedor):
         consulta = consultar_cnpj(novo_cnpj)
         fornecedor.situacao_cadastral = consulta["situacao_cadastral"]
         fornecedor.data_consulta_cnpj = timezone.now()
+        fornecedor.data_abertura = consulta["data_abertura"]
+        fornecedor.porte = consulta["porte"]
+        fornecedor.capital_social = consulta["capital_social"]
     fornecedor.cnpj_fn = novo_cnpj
     
     fornecedor.cep = dados.get("cep", fornecedor.cep)
