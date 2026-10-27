@@ -1,6 +1,7 @@
 # app_fornecedores/cnpj_service.py
 import re
 import requests
+from decimal import Decimal
 
 URL_BRASILAPI = "https://brasilapi.com.br/api/cnpj/v1/{}"
 
@@ -27,9 +28,21 @@ def validar_cnpj(cnpj):
     return cnpj[12:] == f"{d1}{d2}"
 
 
+def _resultado(situacao, dados=None):
+    dados = dados or {}
+    return {
+        "situacao_cadastral": situacao,
+        "data_abertura": dados.get("data_inicio_atividade") or None,
+        "porte": dados.get("porte") or "",
+        "capital_social": Decimal(str(dados["capital_social"])) if dados.get("capital_social") is not None else None,
+        "dados": dados,
+    }
+
+
 def consultar_cnpj(cnpj):
     """
-    Retorna a situação cadastral como texto, ou um status técnico:
+    Retorna um dict com situacao_cadastral, data_abertura, porte, capital_social e dados.
+    situacao_cadastral pode ser:
       "ATIVA", "INAPTA", "BAIXADA", "SUSPENSA", "NULA"  -> vieram da Receita
       "NAO_ENCONTRADO"                                  -> API respondeu que não existe
       "INDISPONIVEL"                                    -> timeout/erro da API
@@ -37,13 +50,13 @@ def consultar_cnpj(cnpj):
     try:
         resp = requests.get(URL_BRASILAPI.format(cnpj), timeout=5)
     except requests.RequestException:
-        return {"situacao_cadastral": "INDISPONIVEL", "dados": {}}
+        return _resultado("INDISPONIVEL")
 
     if resp.status_code in (400, 404):
-        return {"situacao_cadastral": "NAO_ENCONTRADO", "dados": {}}
+        return _resultado("NAO_ENCONTRADO")
     if resp.status_code != 200:
-        return {"situacao_cadastral": "INDISPONIVEL", "dados": {}}
+        return _resultado("INDISPONIVEL")
 
     dados = resp.json()
     situacao = (dados.get("descricao_situacao_cadastral") or "").upper()
-    return {"situacao_cadastral": situacao or "INDISPONIVEL", "dados": dados}
+    return _resultado(situacao or "INDISPONIVEL", dados)
