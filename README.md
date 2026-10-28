@@ -18,4 +18,6 @@ npm install react-router-dom
 
 npm install recharts
 
+npm run dev
+
 pra pegar a .env me manda uma menssagem 😘
